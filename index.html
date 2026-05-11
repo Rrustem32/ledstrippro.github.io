@@ -1,0 +1,3386 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEDStrip Pro – Massanfertigung Schweiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<style>
+/* ── RESET & VARIABLES ─────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0c0f;--surface:#13141a;--surface2:#1a1c24;--surface3:#21232d;
+  --border:#2a2d3a;--border2:#363a4a;
+  --gold:#e8b84b;--gold2:#f5d07a;--gold-dim:rgba(232,184,75,0.12);
+  --text:#eef0f6;--text2:#8b90a6;--text3:#555a6e;
+  --green:#2dd87a;--red:#e85555;--blue:#4a9eff;
+  --r:6px;--r2:10px;--r3:16px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;overflow-x:hidden}
+h1,h2,h3,h4,.syne{font-family:'Syne',sans-serif}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px}
+input,select,textarea{font-family:'DM Sans',sans-serif;font-size:14px}
+::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ══════════════════════════════════════════════════════
+   MOBILE RESPONSIVE — alle Layouts
+   ══════════════════════════════════════════════════════ */
+@media(max-width:768px){
+  /* NAV */
+  #app-nav{padding:0 16px;height:56px}
+  .nav-links{display:none}
+  .nav-right .lang-sel{display:none}
+  .cart-icon-btn span:not(.cart-badge){display:none}
+  #auth-btn,#logout-btn{font-size:12px;padding:6px 12px}
+
+  /* MOBILE NAV BOTTOM */
+  #mobile-nav{display:flex!important}
+
+  /* PAGES */
+  .page{padding-bottom:72px}
+
+  /* HERO */
+  .hero{grid-template-columns:1fr!important;padding:24px 16px 20px!important;gap:24px!important}
+  .hero-title{font-size:32px!important}
+  .hero-visual{display:none}
+  .stat-row{grid-template-columns:1fr 1fr!important;padding:16px!important;gap:10px!important}
+  .stat-row .stat-card:last-child{grid-column:1/-1}
+  .section-wrap{padding:16px!important}
+  .section-wrap > div[style*="grid-template-columns:repeat(3"]{grid-template-columns:1fr!important}
+
+  /* KONFIGURATOR */
+  .config-layout{grid-template-columns:1fr!important;display:block!important}
+  .config-main{padding:16px!important;border-right:none!important;border-bottom:1px solid var(--border)}
+  .config-sidebar{position:static!important;height:auto!important;padding:16px!important}
+  .option-cards.cols3{grid-template-columns:1fr!important}
+  .option-cards.cols2{grid-template-columns:1fr 1fr!important}
+  .delivery-cards{grid-template-columns:1fr 1fr!important}
+  .inputs-grid{grid-template-columns:1fr!important}
+
+  /* AUTH */
+  .auth-layout{grid-template-columns:1fr!important;display:block!important}
+  .auth-left{display:none!important}
+  .auth-right{padding:24px 16px!important}
+
+  /* DASHBOARD */
+  .dash-layout{grid-template-columns:1fr!important;display:block!important}
+  .dash-sidebar{display:none!important}
+  .dash-content{padding:16px!important}
+  .stats-grid{grid-template-columns:1fr 1fr!important}
+  .profile-grid{grid-template-columns:1fr!important}
+  .orders-table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .inv-grid2{grid-template-columns:1fr!important}
+
+  /* CHECKOUT */
+  #page-checkout > div > div[style*="grid-template-columns:1fr 360px"]{grid-template-columns:1fr!important;display:block!important}
+  #page-checkout > div{padding:16px!important}
+  .payment-options{grid-template-columns:1fr 1fr 1fr!important}
+  .pay-opt{padding:10px 6px!important}
+  .pay-opt-icon{font-size:18px!important}
+  .pay-opt-name{font-size:11px!important}
+  #stripe-config-bar{flex-direction:column!important;gap:8px!important}
+  #stripe-pk-inp{width:100%!important;max-width:100%!important}
+
+  /* CHECKOUT — order summary below on mobile */
+  #page-checkout .card[style*="position:sticky"]{position:static!important;margin-top:20px}
+
+  /* INVOICE + LAGER */
+  .admin-layout{grid-template-columns:1fr!important;display:block!important}
+  .inv-stats{grid-template-columns:1fr 1fr!important}
+  .stock-table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .inv-table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .inv-items-table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .inv-form{padding:16px!important}
+  .delivery-grid{grid-template-columns:1fr 1fr!important}
+
+  /* CART PANEL */
+  .cart-panel{width:100%!important}
+
+  /* MODAL */
+  .modal{width:94vw!important;padding:20px!important}
+
+  /* PDF PREVIEW */
+  .pdf-preview{padding:16px!important;font-size:12px!important}
+  .pdf-preview h1{font-size:20px!important}
+  .pdf-preview .pdf-meta{grid-template-columns:1fr!important;gap:12px!important}
+
+  /* TOAST */
+  .toast-container{bottom:80px!important;right:12px!important;left:12px!important}
+  .toast{max-width:100%!important}
+
+  /* TABLES — card layout on mobile */
+  .inv-toolbar{flex-direction:column!important;align-items:stretch!important}
+  .inv-toolbar input,.inv-toolbar select{max-width:100%!important}
+
+  /* CONFIG SIDEBAR sticky fix */
+  .price-big{font-size:24px!important}
+
+  /* LAGER inline actions */
+  .stock-table td button{padding:4px 8px!important;font-size:11px!important}
+
+  /* Supabase bar */
+  #sb-config-bar{flex-direction:column!important;gap:8px!important;padding:10px 12px!important}
+  #sb-config-bar input{width:100%!important}
+  
+  /* Hero actions */
+  .hero-actions{flex-direction:column!important}
+  .hero-actions .btn{width:100%!important;justify-content:center!important}
+}
+
+@media(max-width:480px){
+  .hero-title{font-size:26px!important}
+  .stats-grid{grid-template-columns:1fr!important}
+  .inv-stats{grid-template-columns:1fr 1fr!important}
+  .option-cards.cols2{grid-template-columns:1fr!important}
+  .delivery-cards{grid-template-columns:1fr!important}
+  .payment-options{grid-template-columns:1fr!important}
+  .dimmer-opt{flex-direction:column!important;gap:8px!important}
+  .auth-tabs{font-size:12px}
+  .canton-grid{grid-template-columns:repeat(3,1fr)!important}
+}
+
+/* MOBILE BOTTOM NAV */
+#mobile-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--surface);border-top:1px solid var(--border);
+  z-index:200;padding:0;
+  height:60px;
+}
+.mob-nav-items{display:flex;height:100%}
+.mob-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;color:var(--text2);font-size:10px;font-family:'DM Sans',sans-serif;cursor:pointer;padding:4px 2px;transition:color 0.18s;letter-spacing:0.03em}
+.mob-nav-btn.active{color:var(--gold)}
+.mob-nav-btn i,.mob-nav-icon{font-size:20px;line-height:1}
+.mob-hamburger{display:none}
+@media(max-width:768px){
+  .mob-hamburger{display:flex;align-items:center;justify-content:center;width:40px;height:40px;background:none;border:none;font-size:22px;color:var(--text2);cursor:pointer}
+}
+
+/* MOBILE DRAWER MENU */
+#mobile-drawer{
+  display:none;position:fixed;inset:0;z-index:300;
+  background:rgba(0,0,0,0.7);backdrop-filter:blur(4px)
+}
+#mobile-drawer.open{display:block}
+.drawer-panel{
+  position:absolute;left:0;top:0;bottom:0;width:75vw;max-width:280px;
+  background:var(--surface);border-right:1px solid var(--border);
+  padding:0;overflow-y:auto;
+  animation:drawerIn 0.25s ease
+}
+@keyframes drawerIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+.drawer-header{padding:20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.drawer-logo{font-family:'Syne',sans-serif;font-size:16px;font-weight:800}
+.drawer-logo span{color:var(--gold)}
+.drawer-close{background:none;border:none;font-size:20px;color:var(--text2);cursor:pointer}
+.drawer-links{padding:12px 8px}
+.drawer-link{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:var(--r);font-size:14px;color:var(--text2);cursor:pointer;transition:all 0.18s;border:none;background:none;width:100%;text-align:left}
+.drawer-link:hover,.drawer-link.active{color:var(--text);background:var(--surface2)}
+.drawer-link .dl-icon{font-size:18px;width:24px;text-align:center}
+.drawer-section{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);padding:12px 20px 4px}
+
+/* ── UTILS ──────────────────────────────────────────────── */
+.hidden{display:none!important}
+.flex{display:flex} .flex-col{flex-direction:column} .items-center{align-items:center} .justify-between{justify-content:space-between} .gap-1{gap:8px} .gap-2{gap:12px} .gap-3{gap:16px}
+.text-muted{color:var(--text2)} .text-gold{color:var(--gold)} .text-green{color:var(--green)} .text-red{color:var(--red)}
+.w-full{width:100%} .text-center{text-align:center}
+.mt-1{margin-top:8px} .mt-2{margin-top:16px} .mt-3{margin-top:24px}
+
+/* ── COMPONENTS ─────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border-radius:var(--r);border:none;font-family:'Syne',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.04em;transition:all 0.18s;white-space:nowrap}
+.btn-primary{background:var(--gold);color:#000}
+.btn-primary:hover{background:var(--gold2);transform:translateY(-1px)}
+.btn-dark{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-dark:hover{border-color:var(--border2);background:var(--surface3)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:var(--border2)}
+.btn-danger{background:rgba(232,85,85,0.12);color:var(--red);border:1px solid rgba(232,85,85,0.25)}
+.btn-danger:hover{background:rgba(232,85,85,0.2)}
+.btn-lg{padding:13px 28px;font-size:14px}
+.btn-sm{padding:6px 14px;font-size:12px}
+.btn-full{width:100%}
+.btn:disabled{opacity:0.4;cursor:not-allowed;transform:none!important}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r3)}
+.input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:10px 14px;outline:none;transition:border-color 0.2s}
+.input:focus{border-color:var(--gold)}
+.input::placeholder{color:var(--text3)}
+.label{display:block;font-size:12px;font-weight:500;color:var(--text2);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px}
+.field{margin-bottom:14px}
+.select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:10px 14px;outline:none;appearance:none}
+.select:focus{border-color:var(--gold)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:3px 9px;border-radius:20px}
+.badge-gold{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(232,184,75,0.25)}
+.badge-green{background:rgba(45,216,122,0.1);color:var(--green);border:1px solid rgba(45,216,122,0.2)}
+.badge-red{background:rgba(232,85,85,0.1);color:var(--red);border:1px solid rgba(232,85,85,0.2)}
+.badge-gray{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+.divider{height:1px;background:var(--border);margin:16px 0}
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:12px 18px;font-size:13px;display:flex;align-items:center;gap:10px;animation:slideIn 0.3s ease;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+.toast.success{border-color:rgba(45,216,122,0.3)}
+.toast.error{border-color:rgba(232,85,85,0.3)}
+.toast-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.toast-dot.success{background:var(--green)}
+.toast-dot.error{background:var(--red)}
+.toast-dot.info{background:var(--gold)}
+@keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideOut{from{transform:translateX(0);opacity:1}to{transform:translateX(120%);opacity:0}}
+
+/* ── LOADING SCREEN ─────────────────────────────────────── */
+#loading-screen{position:fixed;inset:0;background:var(--bg);z-index:10000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.loader-logo{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:0.1em}
+.loader-logo span{color:var(--gold)}
+.loader-bar{width:180px;height:2px;background:var(--surface2);border-radius:1px;overflow:hidden}
+.loader-fill{height:100%;background:var(--gold);border-radius:1px;animation:load 1.2s ease forwards}
+@keyframes load{from{width:0}to{width:100%}}
+
+/* ── NAV ────────────────────────────────────────────────── */
+#app-nav{position:sticky;top:0;z-index:100;background:rgba(11,12,15,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;letter-spacing:0.08em;cursor:pointer}
+.nav-logo span{color:var(--gold)}
+.nav-links{display:flex;gap:4px}
+.nav-link{padding:6px 14px;border-radius:var(--r);font-size:13px;color:var(--text2);transition:all 0.18s;cursor:pointer;border:none;background:none}
+.nav-link:hover,.nav-link.active{color:var(--text);background:var(--surface2)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.cart-icon-btn{position:relative;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:7px 14px;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);transition:all 0.18s;cursor:pointer}
+.cart-icon-btn:hover{border-color:var(--border2);color:var(--text)}
+.cart-badge{position:absolute;top:-6px;right:-6px;background:var(--gold);color:#000;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif}
+.lang-sel{background:none;border:1px solid var(--border);border-radius:var(--r);color:var(--text2);padding:6px 10px;font-size:12px;cursor:pointer;outline:none}
+.lang-sel:focus{border-color:var(--gold)}
+
+/* ── PAGES ──────────────────────────────────────────────── */
+.page{display:none;min-height:calc(100vh - 60px)}
+.page.active{display:block}
+
+/* ── HOME PAGE ──────────────────────────────────────────── */
+.hero{padding:80px 40px 60px;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.hero-eyebrow{font-size:11px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
+.hero-title{font-family:'Syne',sans-serif;font-size:52px;font-weight:800;line-height:1.05;margin-bottom:20px}
+.hero-title em{color:var(--gold);font-style:normal}
+.hero-sub{font-size:16px;color:var(--text2);line-height:1.7;margin-bottom:32px;max-width:420px}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+.hero-visual{position:relative}
+.led-preview{background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);padding:24px;position:relative;overflow:hidden}
+.led-strip-viz{height:12px;border-radius:6px;margin-bottom:20px;position:relative;overflow:hidden}
+.led-strip-viz::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.3) 50%,transparent 100%);animation:shimmer 2.5s ease infinite}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.led-2700{background:linear-gradient(90deg,#ff7a00,#ffb347,#ffd280)}
+.led-3000{background:linear-gradient(90deg,#ffb347,#ffd280,#fff0a0)}
+.led-4000{background:linear-gradient(90deg,#fff0a0,#fffde0,#f0f8ff)}
+.temp-pills{display:flex;gap:8px;flex-wrap:wrap}
+.temp-pill{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid;cursor:pointer;transition:all 0.18s;font-family:'Syne',sans-serif}
+.temp-pill:hover{transform:translateY(-1px)}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:24px 40px;max-width:1100px;margin:0 auto}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:20px;text-align:center}
+.stat-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--gold);margin-bottom:4px}
+.stat-label{font-size:12px;color:var(--text2)}
+.section-wrap{max-width:1100px;margin:0 auto;padding:40px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.section-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700}
+
+/* ── CONFIGURATOR PAGE ──────────────────────────────────── */
+.config-layout{display:grid;grid-template-columns:1fr 360px;gap:0;min-height:calc(100vh - 60px)}
+.config-main{padding:32px 40px;border-right:1px solid var(--border);overflow-y:auto}
+.config-sidebar{padding:28px;background:var(--surface);overflow-y:auto;position:sticky;top:60px;height:calc(100vh - 60px)}
+.step-block{margin-bottom:32px}
+.step-heading{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:10px}
+.step-num-badge{width:24px;height:24px;border-radius:50%;background:var(--gold);color:#000;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;flex-shrink:0}
+.step-sub{font-size:13px;color:var(--text2);margin-bottom:16px;padding-left:34px}
+.option-cards{display:grid;gap:10px}
+.option-cards.cols3{grid-template-columns:repeat(3,1fr)}
+.option-cards.cols2{grid-template-columns:repeat(2,1fr)}
+.option-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:16px;cursor:pointer;transition:all 0.18s;position:relative}
+.option-card:hover{border-color:var(--border2);background:var(--surface3)}
+.option-card.selected{border-color:var(--gold);background:var(--gold-dim)}
+.option-card.selected::after{content:'✓';position:absolute;top:10px;right:12px;color:var(--gold);font-size:12px;font-weight:700;font-family:'Syne',sans-serif}
+.oc-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px}
+.oc-desc{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:8px}
+.oc-price{font-size:13px;color:var(--gold);font-weight:600;font-family:'Syne',sans-serif}
+.temp-swatch{height:28px;border-radius:4px;margin-bottom:10px}
+.inputs-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.input-with-unit{position:relative}
+.input-with-unit .input{padding-right:50px}
+.input-unit{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text3);pointer-events:none}
+.dimmer-options{display:flex;flex-direction:column;gap:8px}
+.dimmer-opt{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;cursor:pointer;transition:all 0.18s}
+.dimmer-opt:hover{border-color:var(--border2)}
+.dimmer-opt.selected{border-color:var(--gold);background:var(--gold-dim)}
+.dimmer-opt-left{display:flex;flex-direction:column;gap:3px}
+.dimmer-opt-name{font-size:14px;font-weight:500}
+.dimmer-opt-desc{font-size:12px;color:var(--text2)}
+.toggle-switch{width:40px;height:22px;border-radius:11px;background:var(--surface3);border:1px solid var(--border);position:relative;transition:all 0.2s;flex-shrink:0}
+.toggle-switch.on{background:var(--gold);border-color:var(--gold)}
+.toggle-switch::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform 0.2s;opacity:0.7}
+.toggle-switch.on::after{transform:translateX(18px);opacity:1}
+.delivery-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.delivery-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:16px;cursor:pointer;transition:all 0.18s}
+.delivery-card:hover{border-color:var(--border2)}
+.delivery-card.selected{border-color:var(--gold);background:var(--gold-dim)}
+.dc-icon{font-size:22px;margin-bottom:8px}
+.dc-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:3px}
+.dc-days{font-size:12px;color:var(--text2);margin-bottom:8px}
+.dc-price{font-size:14px;color:var(--gold);font-weight:600;font-family:'Syne',sans-serif}
+.express-alert{background:rgba(232,184,75,0.08);border:1px solid rgba(232,184,75,0.25);border-radius:var(--r);padding:12px 16px;font-size:13px;color:var(--gold);margin-top:12px;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.summary-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.sum-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.sum-item:last-child{border-bottom:none}
+.sum-key{font-size:12px;color:var(--text2)}
+.sum-val{font-size:13px;font-weight:500}
+.sum-val.gold{color:var(--gold)}
+.price-total-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:16px;margin:16px 0}
+.price-big{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:var(--gold)}
+.price-vat{font-size:11px;color:var(--text3);margin-top:2px}
+.led-bar-viz{height:8px;border-radius:4px;background:var(--surface3);margin:16px 0;overflow:hidden}
+.led-bar-fill{height:100%;border-radius:4px;transition:all 0.4s ease;width:0%}
+
+/* ── AUTH PAGE ──────────────────────────────────────────── */
+.auth-layout{display:grid;grid-template-columns:1fr 480px;min-height:calc(100vh - 60px)}
+.auth-left{background:var(--surface);border-right:1px solid var(--border);padding:60px 48px;display:flex;flex-direction:column;justify-content:center}
+.auth-big-title{font-family:'Syne',sans-serif;font-size:42px;font-weight:800;line-height:1.1;margin-bottom:16px}
+.auth-big-title em{color:var(--gold);font-style:normal}
+.auth-feature{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text2)}
+.auth-feature:last-child{border-bottom:none}
+.auth-feature-icon{width:32px;height:32px;border-radius:50%;background:var(--gold-dim);border:1px solid rgba(232,184,75,0.2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.auth-right{padding:40px 48px;display:flex;align-items:center}
+.auth-form-wrap{width:100%}
+.auth-screen{display:none}
+.auth-screen.active{display:block}
+.auth-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:28px}
+.auth-tab{flex:1;padding:10px;background:none;border:none;color:var(--text2);font-family:'Syne',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.18s;letter-spacing:0.04em}
+.auth-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.auth-heading{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px}
+.auth-subheading{font-size:13px;color:var(--text2);margin-bottom:28px;line-height:1.6}
+.method-btn{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;transition:all 0.18s;width:100%;margin-bottom:10px;text-align:left}
+.method-btn:hover{border-color:var(--gold);background:var(--gold-dim)}
+.method-btn.apple{background:var(--text);color:#000;border-color:var(--text)}
+.method-btn.apple:hover{background:var(--gold);border-color:var(--gold)}
+.method-icon{width:28px;height:28px;border-radius:50%;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.apple .method-icon{background:rgba(0,0,0,0.15)}
+.or-divider{display:flex;align-items:center;gap:12px;margin:16px 0;font-size:12px;color:var(--text3);letter-spacing:0.1em}
+.or-line{flex:1;height:1px;background:var(--border)}
+.otp-row{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:20px 0}
+.otp-inp{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'Syne',sans-serif;font-size:20px;font-weight:700;text-align:center;padding:12px 4px;outline:none;transition:border-color 0.2s;width:100%}
+.otp-inp:focus{border-color:var(--gold)}
+.pw-wrap{position:relative}
+.pw-wrap .input{padding-right:42px}
+.pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:2px}
+.pw-eye:hover{color:var(--text2)}
+.strength-row{display:flex;gap:4px;margin-top:8px}
+.str-bar{flex:1;height:3px;border-radius:2px;background:var(--border);transition:background 0.3s}
+.str-label{font-size:11px;color:var(--text3);margin-top:4px}
+.phone-row{display:flex;gap:0}
+.cc-sel{background:var(--surface2);border:1px solid var(--border);border-right:none;border-radius:var(--r) 0 0 var(--r);color:var(--text);padding:10px 10px;outline:none;min-width:96px;font-size:13px}
+.phone-input{border-radius:0 var(--r) var(--r) 0!important}
+.back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--text2);font-size:13px;cursor:pointer;margin-bottom:20px;padding:0;transition:color 0.18s}
+.back-btn:hover{color:var(--text)}
+.check-label{display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:var(--text2);margin:10px 0;user-select:none}
+.check-label input{accent-color:var(--gold);width:15px;height:15px;flex-shrink:0;margin-top:2px}
+.progress-dots{display:flex;gap:6px;justify-content:center;margin-bottom:24px}
+.pdot{width:6px;height:6px;border-radius:3px;background:var(--border2);transition:all 0.3s}
+.pdot.active{width:20px;background:var(--gold)}
+.pdot.done{background:var(--green)}
+.success-box{text-align:center;padding:20px 0}
+.success-icon{width:64px;height:64px;border-radius:50%;background:rgba(45,216,122,0.12);border:1px solid rgba(45,216,122,0.3);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 20px}
+.info-alert{background:rgba(74,158,255,0.08);border:1px solid rgba(74,158,255,0.2);border-radius:var(--r);padding:12px 16px;font-size:13px;color:#7ab8ff;display:flex;gap:8px;line-height:1.6;margin-bottom:16px}
+.resend-row{text-align:center;margin-top:12px;font-size:13px;color:var(--text2)}
+.resend-btn{background:none;border:none;color:var(--gold);font-size:13px;cursor:pointer}
+.resend-btn:disabled{color:var(--text3);cursor:default}
+
+/* ── DASHBOARD PAGE ─────────────────────────────────────── */
+.dash-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 60px)}
+.dash-sidebar{background:var(--surface);border-right:1px solid var(--border);padding:24px 16px}
+.dash-nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--r);font-size:14px;color:var(--text2);cursor:pointer;transition:all 0.18s;border:none;background:none;width:100%;text-align:left}
+.dash-nav-item:hover{background:var(--surface2);color:var(--text)}
+.dash-nav-item.active{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(232,184,75,0.2)}
+.dash-nav-section{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);padding:16px 14px 6px}
+.dash-content{padding:32px 40px;overflow-y:auto}
+.dash-header{margin-bottom:32px}
+.dash-welcome{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:4px}
+.dash-sub{font-size:14px;color:var(--text2)}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
+.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:20px}
+.stat-box-label{font-size:12px;color:var(--text2);margin-bottom:8px}
+.stat-box-val{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--text)}
+.stat-box-sub{font-size:12px;color:var(--text3);margin-top:4px}
+.orders-table{width:100%;border-collapse:collapse}
+.orders-table th{text-align:left;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);padding:0 16px 12px;border-bottom:1px solid var(--border)}
+.orders-table td{padding:14px 16px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+.orders-table tr:hover td{background:var(--surface2)}
+.orders-table tr:last-child td{border-bottom:none}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.profile-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:24px}
+.profile-card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:20px}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text2)}
+.empty-icon{font-size:40px;margin-bottom:12px;opacity:0.4}
+.empty-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
+.empty-desc{font-size:13px;color:var(--text2);margin-bottom:20px}
+.dash-tab{display:none}
+.dash-tab.active{display:block}
+
+/* ── CHECKOUT / CART ─────────────────────────────────────── */
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:500;display:flex;justify-content:flex-end;backdrop-filter:blur(4px)}
+.cart-panel{width:420px;background:var(--surface);height:100%;display:flex;flex-direction:column;border-left:1px solid var(--border);animation:slideFromRight 0.3s ease}
+@keyframes slideFromRight{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.cart-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.cart-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700}
+.cart-close{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--text2);transition:all 0.18s}
+.cart-close:hover{color:var(--text);border-color:var(--border2)}
+.cart-body{flex:1;overflow-y:auto;padding:16px 24px}
+.cart-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.cart-item:last-child{border-bottom:none}
+.cart-item-icon{width:48px;height:48px;border-radius:var(--r);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;border:1px solid var(--border)}
+.cart-item-info{flex:1}
+.cart-item-name{font-size:14px;font-weight:500;margin-bottom:4px}
+.cart-item-meta{font-size:12px;color:var(--text2);line-height:1.5}
+.cart-item-price{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--gold);white-space:nowrap}
+.cart-item-remove{background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;padding:0;margin-top:6px;transition:color 0.18s;letter-spacing:0.06em;text-transform:uppercase}
+.cart-item-remove:hover{color:var(--red)}
+.cart-footer{padding:20px 24px;border-top:1px solid var(--border)}
+.cart-subtotal{display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:6px}
+.cart-total{display:flex;justify-content:space-between;font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:16px}
+.cart-total span:last-child{color:var(--gold)}
+.checkout-form{padding:28px 40px;max-width:700px;margin:0 auto}
+.checkout-section{margin-bottom:32px}
+.checkout-section-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.payment-options{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.pay-opt{background:var(--surface2);border:2px solid var(--border);border-radius:var(--r2);padding:16px;cursor:pointer;transition:all 0.18s;text-align:center}
+.pay-opt:hover{border-color:var(--border2)}
+.pay-opt.selected{border-color:var(--gold);background:var(--gold-dim)}
+.pay-opt-icon{font-size:22px;margin-bottom:6px}
+.pay-opt-name{font-size:12px;font-weight:600;font-family:'Syne',sans-serif}
+.order-confirm-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);padding:40px;text-align:center;max-width:500px;margin:40px auto}
+.order-confirm-icon{width:72px;height:72px;border-radius:50%;background:rgba(45,216,122,0.12);border:2px solid rgba(45,216,122,0.3);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 24px}
+.order-num{font-size:13px;color:var(--text2);margin-bottom:6px}
+.order-num span{color:var(--gold);font-family:'Syne',sans-serif;font-weight:700}
+
+/* ── INVOICES ───────────────────────────────────────────── */
+.inv-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.inv-table{width:100%;border-collapse:collapse}
+.inv-table th{text-align:left;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);padding:0 14px 10px;border-bottom:1px solid var(--border)}
+.inv-table td{padding:13px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+.inv-table tr:hover td{background:var(--surface2)}
+.inv-table tr:last-child td{border-bottom:none}
+.inv-form{background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);padding:28px;max-width:800px}
+.inv-form-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.inv-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.inv-items-table{width:100%;border-collapse:collapse;margin-top:8px}
+.inv-items-table th{text-align:left;font-size:11px;color:var(--text3);padding:6px 10px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:0.06em}
+.inv-items-table td{padding:8px 10px;border-bottom:1px solid var(--border);font-size:13px}
+.inv-items-table td input{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 8px;width:100%;outline:none;font-size:13px}
+.inv-items-table td input:focus{border-color:var(--gold)}
+.inv-total-row{display:flex;justify-content:flex-end;gap:20px;align-items:center;padding:12px 10px;border-top:1px solid var(--border);font-size:14px}
+.inv-total-row strong{font-family:'Syne',sans-serif;font-size:20px;color:var(--gold)}
+.pdf-preview{background:#fff;color:#000;border-radius:var(--r2);padding:40px;max-width:700px;margin:24px auto;font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;line-height:1.6;box-shadow:0 8px 40px rgba(0,0,0,0.4)}
+.pdf-preview h1{font-size:28px;font-weight:800;color:#1a1a1a;margin-bottom:4px}
+.pdf-preview .pdf-meta{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:24px 0;padding:20px;background:#f8f8f8;border-radius:6px}
+.pdf-preview .pdf-table{width:100%;border-collapse:collapse;margin-top:16px}
+.pdf-preview .pdf-table th{background:#1a1a1a;color:#fff;padding:8px 12px;text-align:left;font-size:12px}
+.pdf-preview .pdf-table td{padding:8px 12px;border-bottom:1px solid #eee;font-size:13px}
+.pdf-preview .pdf-total{text-align:right;margin-top:20px;padding:16px;background:#f8f8f8;border-radius:6px}
+.qr-placeholder{width:80px;height:80px;background:#f0f0f0;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:10px;color:#999;border-radius:4px;margin-top:12px}
+
+/* ── INVENTORY ──────────────────────────────────────────── */
+.inv-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stock-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:18px}
+.stock-card-label{font-size:12px;color:var(--text2);margin-bottom:6px}
+.stock-card-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:800}
+.stock-card-sub{font-size:11px;color:var(--text3);margin-top:3px}
+.stock-table{width:100%;border-collapse:collapse}
+.stock-table th{text-align:left;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);padding:0 14px 10px;border-bottom:1px solid var(--border)}
+.stock-table td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+.stock-table tr:hover td{background:var(--surface2)}
+.stock-bar{height:6px;border-radius:3px;background:var(--surface3);overflow:hidden;width:80px;display:inline-block;vertical-align:middle;margin-right:6px}
+.stock-bar-fill{height:100%;border-radius:3px;transition:width 0.4s}
+.movement-tag{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;letter-spacing:0.04em}
+.mv-in{background:rgba(45,216,122,0.12);color:var(--green);border:1px solid rgba(45,216,122,0.2)}
+.mv-out{background:rgba(232,85,85,0.12);color:var(--red);border:1px solid rgba(232,85,85,0.2)}
+.mv-adj{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(232,184,75,0.2)}
+.stock-alert{background:rgba(232,85,85,0.08);border:1px solid rgba(232,85,85,0.2);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--red);display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);padding:28px;width:480px;max-width:95vw}
+.modal-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:20px}
+
+/* ── ADMIN ─────────────────────────────────────────────── */
+.admin-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 60px)}
+.admin-badge{background:rgba(232,85,85,0.12);color:var(--red);border:1px solid rgba(232,85,85,0.25);font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:2px 8px;border-radius:20px}
+.status-select{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:4px 8px;font-size:12px;outline:none;cursor:pointer}
+
+/* ── SUPABASE CONFIG ────────────────────────────────────── */
+.sb-config-bar{background:rgba(232,184,75,0.08);border-bottom:1px solid rgba(232,184,75,0.2);padding:10px 24px;display:flex;align-items:center;gap:12px;font-size:13px}
+.sb-config-bar input{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 12px;font-size:12px;width:260px;outline:none}
+.sb-config-bar input:focus{border-color:var(--gold)}
+.sb-status{display:flex;align-items:center;gap:6px;font-size:12px;padding:4px 10px;border-radius:20px}
+.sb-status.connected{background:rgba(45,216,122,0.1);color:var(--green);border:1px solid rgba(45,216,122,0.2)}
+.sb-status.disconnected{background:rgba(232,85,85,0.1);color:var(--red);border:1px solid rgba(232,85,85,0.2)}
+.sb-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.config-toggle-btn{background:none;border:1px solid var(--border);border-radius:var(--r);color:var(--text2);font-size:12px;padding:5px 12px;cursor:pointer;transition:all 0.18s}
+.config-toggle-btn:hover{border-color:var(--gold);color:var(--gold)}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading-screen">
+  <div class="loader-logo">LED<span>STRIP</span>·PRO</div>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+  <div style="font-size:12px;color:var(--text3);margin-top:8px">Massanfertigung Schweiz</div>
+</div>
+
+<!-- SUPABASE CONFIG BAR -->
+<div id="sb-config-bar" class="sb-config-bar">
+  <span style="color:var(--gold);font-weight:600;font-size:12px;font-family:'Syne',sans-serif">⚙ Supabase</span>
+  <input id="sb-url-inp" placeholder="Project URL (https://xyz.supabase.co)" />
+  <input id="sb-key-inp" placeholder="Anon Public Key" />
+  <button class="btn btn-primary btn-sm" onclick="initSupabase()">Verbinden</button>
+  <div class="sb-status disconnected" id="sb-status"><div class="sb-dot"></div><span id="sb-status-txt">Nicht verbunden · Demo-Modus</span></div>
+  <button class="config-toggle-btn" onclick="document.getElementById('sb-config-bar').style.display='none'">Ausblenden</button>
+  <span style="color:var(--text3);font-size:11px;margin-left:auto">Ohne Supabase läuft alles als Demo</span>
+</div>
+
+<!-- NAV -->
+<nav id="app-nav">
+  <div class="nav-logo" onclick="showPage('home')">LED<span>STRIP</span>·PRO</div>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="showPage('home')" id="nav-home" data-nav="home">Shop</button>
+    <button class="nav-link" onclick="showPage('config')" id="nav-config" data-nav="config">Konfigurator</button>
+    <button class="nav-link" id="nav-dash" data-nav="dash" onclick="requireAuth('dash')" style="display:none">Mein Konto</button>
+    <button class="nav-link" id="nav-invoices" data-nav="invoices" onclick="requireAuth('invoices')" style="display:none">🧾 Rechnungen</button>
+    <button class="nav-link" id="nav-inventory" data-nav="inventory" onclick="requireAuth('inventory')" style="display:none">📦 Lager</button>
+    <button class="nav-link" id="nav-admin" data-nav="admin" onclick="showPage('admin')" style="display:none">Admin <span class="admin-badge">Admin</span></button>
+  </div>
+  <div class="nav-right">
+    <select class="lang-sel" id="lang-sel" onchange="setLang(this.value)">
+      <option value="de">🇨🇭 DE</option>
+      <option value="en">🇬🇧 EN</option>
+      <option value="fr">🇫🇷 FR</option>
+    </select>
+    <button class="cart-icon-btn" onclick="openCart()">
+      🛒 Warenkorb
+      <span class="cart-badge" id="cart-badge" style="display:none">0</span>
+    </button>
+    <button class="btn btn-ghost btn-sm" id="auth-btn" onclick="showPage('auth')">Anmelden</button>
+    <button class="btn btn-primary btn-sm" id="logout-btn" onclick="logout()" style="display:none">Abmelden</button>
+  </div>
+</nav>
+
+<!-- MOBILE HAMBURGER (injected into nav via JS) -->
+
+<!-- MOBILE DRAWER -->
+<div id="mobile-drawer" onclick="closeMobileDrawer(event)">
+  <div class="drawer-panel">
+    <div class="drawer-header">
+      <div class="drawer-logo">LED<span>STRIP</span>·PRO</div>
+      <button class="drawer-close" onclick="closeMobileDrawer()">✕</button>
+    </div>
+    <div class="drawer-links" id="drawer-links">
+      <button class="drawer-link active" onclick="showPage('home');closeMobileDrawer()" data-mob-page="home"><span class="dl-icon">🏠</span>Shop</button>
+      <button class="drawer-link" onclick="showPage('config');closeMobileDrawer()" data-mob-page="config"><span class="dl-icon">⚙</span>Konfigurator</button>
+      <div id="drawer-auth-section">
+        <div class="drawer-section">Konto</div>
+        <button class="drawer-link" id="mob-dash-link" onclick="requireAuth('dash');closeMobileDrawer()" style="display:none" data-mob-page="dash"><span class="dl-icon">👤</span>Mein Konto</button>
+        <button class="drawer-link" id="mob-invoices-link" onclick="requireAuth('invoices');closeMobileDrawer()" style="display:none" data-mob-page="invoices"><span class="dl-icon">🧾</span>Rechnungen</button>
+        <button class="drawer-link" id="mob-inventory-link" onclick="requireAuth('inventory');closeMobileDrawer()" style="display:none" data-mob-page="inventory"><span class="dl-icon">📦</span>Lager</button>
+        <button class="drawer-link" id="mob-admin-link" onclick="showPage('admin');closeMobileDrawer()" style="display:none" data-mob-page="admin"><span class="dl-icon">🔧</span>Admin</button>
+        <button class="drawer-link" id="mob-auth-link" onclick="showPage('auth');closeMobileDrawer()"><span class="dl-icon">🔑</span>Anmelden</button>
+        <button class="drawer-link" id="mob-logout-link" onclick="logout();closeMobileDrawer()" style="display:none"><span class="dl-icon">🚪</span>Abmelden</button>
+      </div>
+      <div class="drawer-section">Sprache</div>
+      <div style="display:flex;gap:8px;padding:8px 16px">
+        <button class="btn btn-ghost btn-sm" onclick="setLang('de',null)">🇨🇭 DE</button>
+        <button class="btn btn-ghost btn-sm" onclick="setLang('en',null)">🇬🇧 EN</button>
+        <button class="btn btn-ghost btn-sm" onclick="setLang('fr',null)">🇫🇷 FR</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<div id="mobile-nav">
+  <div class="mob-nav-items">
+    <button class="mob-nav-btn active" id="mob-btn-home" onclick="showPage('home');setMobActive('home')"><span class="mob-nav-icon">🏠</span>Shop</button>
+    <button class="mob-nav-btn" id="mob-btn-config" onclick="showPage('config');setMobActive('config')"><span class="mob-nav-icon">⚙</span>Konfigurator</button>
+    <button class="mob-nav-btn" id="mob-btn-cart" onclick="openCart()"><span class="mob-nav-icon">🛒</span>Warenkorb</button>
+    <button class="mob-nav-btn" id="mob-btn-account" onclick="requireAuth('dash');setMobActive('dash')"><span class="mob-nav-icon">👤</span>Konto</button>
+    <button class="mob-nav-btn" id="mob-btn-menu" onclick="openMobileDrawer()"><span class="mob-nav-icon">☰</span>Menü</button>
+  </div>
+</div>
+<div id="pages">
+
+<!-- ── HOME ───────────────────────────────────────────── -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div>
+      <div class="hero-eyebrow">✦ Massanfertigung · Schweiz</div>
+      <h1 class="hero-title">LED-Bänder<br>auf <em>Mass</em><br>gefertigt</h1>
+      <p class="hero-sub">Professionelle LED-Streifen in 2700K, 3000K und 4000K — mit Dimmer, DALI oder Standard. Konfigurier, bestell, fertig.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary btn-lg" onclick="showPage('config')">Jetzt konfigurieren →</button>
+        <button class="btn btn-dark btn-lg" onclick="showPage('auth')">Konto erstellen</button>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="led-preview">
+        <div id="led-viz" class="led-strip-viz led-3000"></div>
+        <div class="temp-pills">
+          <span class="temp-pill" style="color:#ffb347;border-color:#ffb347" onclick="setLedViz('led-2700')">2700K Warmweiss</span>
+          <span class="temp-pill" style="color:#ffd280;border-color:#ffd280" onclick="setLedViz('led-3000')">3000K</span>
+          <span class="temp-pill" style="color:#f0f8ff;border-color:#c0d8f0" onclick="setLedViz('led-4000')">4000K Neutralweiss</span>
+        </div>
+        <div style="margin-top:16px;font-size:12px;color:var(--text2);line-height:1.7">
+          ✓ Dimmbar &nbsp;·&nbsp; ✓ DALI dimmbar &nbsp;·&nbsp; ✓ Express-Lieferung<br>
+          ✓ Kabel auf Mass &nbsp;·&nbsp; ✓ MwSt. inkl.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-num">2700–4000</div><div class="stat-label">Kelvin Farbtemperatur</div></div>
+    <div class="stat-card"><div class="stat-num">50 m</div><div class="stat-label">Max. Bestelllänge</div></div>
+    <div class="stat-card"><div class="stat-num">1–2 Tage</div><div class="stat-label">Express-Lieferung</div></div>
+  </div>
+  <div class="section-wrap">
+    <div class="section-header">
+      <div class="section-title">Warum LEDStrip Pro?</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+      <div class="card" style="padding:24px">
+        <div style="font-size:28px;margin-bottom:12px">⚡</div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:8px">Express 1–2 Tage</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6">Für dringende Projekte: Bestellung bis 10:00 Uhr, Versand noch heute.</div>
+      </div>
+      <div class="card" style="padding:24px">
+        <div style="font-size:28px;margin-bottom:12px">📐</div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:8px">Auf Mass konfektioniert</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6">Exakt auf deine Masse zugeschnitten — kein Zuschneiden, kein Löten nötig.</div>
+      </div>
+      <div class="card" style="padding:24px">
+        <div style="font-size:28px;margin-bottom:12px">🎛</div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:8px">DALI dimmbar</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6">Professionelle Bussteuerung für Büro, Hotel und Architektur-Projekte.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── KONFIGURATOR ────────────────────────────────────── -->
+<div class="page" id="page-config">
+  <div class="config-layout">
+    <div class="config-main">
+      <div style="margin-bottom:28px">
+        <h2 style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:4px">LED-Band konfigurieren</h2>
+        <p style="font-size:14px;color:var(--text2)">Wähle Farbtemperatur, Masse, Dimmer und Lieferung.</p>
+      </div>
+
+      <!-- STEP 1: TEMP -->
+      <div class="step-block">
+        <div class="step-heading"><div class="step-num-badge">1</div>Farbtemperatur</div>
+        <div class="step-sub">Welche Lichtfarbe soll es sein?</div>
+        <div class="option-cards cols3" id="temp-grid">
+          <div class="option-card" onclick="selectTemp(this,'2700K','linear-gradient(90deg,#ff7a00,#ffb347)',12.50)">
+            <div class="temp-swatch" style="background:linear-gradient(90deg,#ff7a00,#ffb347)"></div>
+            <div class="oc-title">2700 K</div>
+            <div class="oc-desc">Warmweiss · Gemütlich<br>Wohn- & Schlafzimmer</div>
+            <div class="oc-price">CHF 12.50 / m</div>
+          </div>
+          <div class="option-card" onclick="selectTemp(this,'3000K','linear-gradient(90deg,#ffb347,#ffd280)',13.50)">
+            <div class="temp-swatch" style="background:linear-gradient(90deg,#ffb347,#ffd280)"></div>
+            <div class="oc-title">3000 K</div>
+            <div class="oc-desc">Warmweiss+ · Elegant<br>Küche & Esszimmer</div>
+            <div class="oc-price">CHF 13.50 / m</div>
+          </div>
+          <div class="option-card" onclick="selectTemp(this,'4000K','linear-gradient(90deg,#fff5d0,#f0f8ff)',14.50)">
+            <div class="temp-swatch" style="background:linear-gradient(90deg,#fff5d0,#f0f8ff)"></div>
+            <div class="oc-title">4000 K</div>
+            <div class="oc-desc">Neutralweiss · Klar<br>Büro & Bad</div>
+            <div class="oc-price">CHF 14.50 / m</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: MASSE -->
+      <div class="step-block">
+        <div class="step-heading"><div class="step-num-badge">2</div>Masse eingeben</div>
+        <div class="step-sub">LED-Bandlänge und Zuleitungskabel</div>
+        <div class="inputs-grid">
+          <div class="field">
+            <label class="label">LED-Band Länge</label>
+            <div class="input-with-unit">
+              <input class="input" type="number" id="band-len" min="0.1" max="50" step="0.1" placeholder="z.B. 3.5" oninput="calcPrice()">
+              <span class="input-unit">m</span>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Kabellänge</label>
+            <div class="input-with-unit">
+              <input class="input" type="number" id="cable-len" min="0" max="20" step="0.5" placeholder="z.B. 1.5" oninput="calcPrice()">
+              <span class="input-unit">m</span>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Nischenbreite (optional)</label>
+            <div class="input-with-unit">
+              <input class="input" type="number" id="niche-w" min="0" max="5000" step="10" placeholder="z.B. 2400" oninput="calcPrice()">
+              <span class="input-unit">mm</span>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Stückzahl</label>
+            <div class="input-with-unit">
+              <input class="input" type="number" id="qty" min="1" max="100" step="1" value="1" oninput="calcPrice()">
+              <span class="input-unit">Stk.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: DIMMER -->
+      <div class="step-block">
+        <div class="step-heading"><div class="step-num-badge">3</div>Dimmer-Option</div>
+        <div class="step-sub">Steuerung des LED-Bands</div>
+        <div class="dimmer-options">
+          <div class="dimmer-opt selected" id="d-none" onclick="selectDimmer('none',0)">
+            <div class="dimmer-opt-left">
+              <div class="dimmer-opt-name">Nicht dimmbar</div>
+              <div class="dimmer-opt-desc">Standard — kein Dimmer erforderlich</div>
+            </div>
+            <div class="toggle-switch on" id="sw-none"><div></div></div>
+          </div>
+          <div class="dimmer-opt" id="d-phase" onclick="selectDimmer('phase',8)">
+            <div class="dimmer-opt-left">
+              <div class="dimmer-opt-name">Dimmbar (Phasenanschnitt)</div>
+              <div class="dimmer-opt-desc">Kompatibel mit Standard-Wanddimmern · +CHF 8/m</div>
+            </div>
+            <div class="toggle-switch" id="sw-phase"><div></div></div>
+          </div>
+          <div class="dimmer-opt" id="d-dali" onclick="selectDimmer('dali',18)">
+            <div class="dimmer-opt-left">
+              <div class="dimmer-opt-name">DALI dimmbar</div>
+              <div class="dimmer-opt-desc">Busgesteuert, professionell · +CHF 18/m</div>
+            </div>
+            <div class="toggle-switch" id="sw-dali"><div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4: LIEFERUNG -->
+      <div class="step-block">
+        <div class="step-heading"><div class="step-num-badge">4</div>Lieferung</div>
+        <div class="step-sub">Lieferzeit und Wunschdatum wählen</div>
+        <div class="delivery-cards">
+          <div class="delivery-card" id="del-standard" onclick="selectDelivery('standard',8.90)">
+            <div class="dc-icon">📦</div>
+            <div class="dc-name">Standard</div>
+            <div class="dc-days">5–8 Werktage</div>
+            <div class="dc-price">CHF 8.90</div>
+          </div>
+          <div class="delivery-card" id="del-express" onclick="selectDelivery('express',24.90)">
+            <div class="dc-icon">⚡</div>
+            <div class="dc-name">Express</div>
+            <div class="dc-days">1–2 Werktage</div>
+            <div class="dc-price">CHF 24.90</div>
+          </div>
+        </div>
+        <div class="express-alert hidden" id="express-note">
+          ⚡ <strong>Express-Auftrag:</strong> Bestellung bis 10:00 Uhr → Versand noch heute. Fertigung wird priorisiert.
+        </div>
+        <div class="field" style="margin-top:16px">
+          <label class="label">Wunschlieferdatum (optional)</label>
+          <input class="input" type="date" id="wish-date" style="max-width:220px" onchange="calcPrice()">
+        </div>
+      </div>
+    </div>
+
+    <!-- SUMMARY SIDEBAR -->
+    <div class="config-sidebar">
+      <div class="summary-title">Zusammenfassung</div>
+      <div class="led-bar-viz"><div class="led-bar-fill" id="led-bar-fill"></div></div>
+      <div id="sum-rows">
+        <div class="sum-item"><span class="sum-key">Farbtemperatur</span><span class="sum-val" id="s-temp" style="color:var(--text3)">—</span></div>
+        <div class="sum-item"><span class="sum-key">LED-Länge</span><span class="sum-val" id="s-len" style="color:var(--text3)">—</span></div>
+        <div class="sum-item"><span class="sum-key">Kabel</span><span class="sum-val" id="s-cable" style="color:var(--text3)">—</span></div>
+        <div class="sum-item"><span class="sum-key">Stückzahl</span><span class="sum-val" id="s-qty">1 Stk.</span></div>
+        <div class="sum-item"><span class="sum-key">Dimmer</span><span class="sum-val" id="s-dimmer">Nicht dimmbar</span></div>
+        <div class="sum-item"><span class="sum-key">Lieferung</span><span class="sum-val" id="s-delivery" style="color:var(--text3)">—</span></div>
+        <div class="sum-item"><span class="sum-key">Wunschdatum</span><span class="sum-val" id="s-date" style="color:var(--text3)">—</span></div>
+      </div>
+      <div class="price-total-box" style="margin-top:20px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em">Gesamtpreis inkl. MwSt.</div>
+        <div class="price-big" id="total-price">CHF —</div>
+        <div class="price-vat" id="total-vat"></div>
+      </div>
+      <button class="btn btn-primary btn-full btn-lg" id="order-btn" onclick="addToCart()" disabled>In den Warenkorb</button>
+      <div style="font-size:12px;color:var(--text3);text-align:center;margin-top:10px" id="missing-msg">Bitte Farbtemperatur, Länge und Lieferart wählen</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── AUTH ───────────────────────────────────────────── -->
+<div class="page" id="page-auth">
+  <div class="auth-layout">
+    <div class="auth-left">
+      <div class="hero-eyebrow">✦ Sicher · Schnell · Einfach</div>
+      <h2 class="auth-big-title" style="margin-top:16px">Dein Konto<br>bei <em>LEDStrip</em><br><em>Pro</em></h2>
+      <p style="font-size:14px;color:var(--text2);margin-bottom:32px;line-height:1.7">Verwalte deine Bestellungen, Konfigurationen und Rechnungen — alles an einem Ort.</p>
+      <div class="auth-feature"><div class="auth-feature-icon">🔒</div>Sichere Anmeldung mit Verifizierung</div>
+      <div class="auth-feature"><div class="auth-feature-icon"></div>Apple ID — ein Klick, kein Passwort</div>
+      <div class="auth-feature"><div class="auth-feature-icon">📱</div>SMS-Code auf dein Handy</div>
+      <div class="auth-feature"><div class="auth-feature-icon">📦</div>Bestellverlauf & Rechnungen</div>
+      <div class="auth-feature"><div class="auth-feature-icon">⚡</div>Gespeicherte Konfigurationen</div>
+    </div>
+    <div class="auth-right">
+      <div class="auth-form-wrap">
+
+        <!-- SCREEN: CHOICE -->
+        <div class="auth-screen active" id="asc-choice">
+          <div class="auth-tabs">
+            <button class="auth-tab active" id="tab-reg" onclick="switchAuthTab('reg',this)">Konto erstellen</button>
+            <button class="auth-tab" id="tab-login" onclick="switchAuthTab('login',this)">Anmelden</button>
+          </div>
+          <h3 class="auth-heading" id="choice-heading">Willkommen</h3>
+          <p class="auth-subheading" id="choice-subheading">Erstelle dein Konto oder melde dich an.</p>
+          <button class="method-btn apple" onclick="authApple()">
+            <div class="method-icon">🍎</div>
+            <span id="btn-apple-txt">Mit Apple ID fortfahren</span>
+          </button>
+          <div class="or-divider"><div class="or-line"></div><span>oder</span><div class="or-line"></div></div>
+          <button class="method-btn" onclick="goAuthScreen('asc-email')">
+            <div class="method-icon" style="background:var(--gold-dim)">✉️</div>
+            <span id="btn-email-txt">Mit E-Mail</span>
+            <span class="badge badge-gold" style="margin-left:auto;font-size:10px" id="verify-badge">+ Verifizierung</span>
+          </button>
+          <button class="method-btn" onclick="goAuthScreen('asc-phone')">
+            <div class="method-icon" style="background:var(--gold-dim)">📱</div>
+            <span id="btn-phone-txt">Mit Handynummer</span>
+            <span class="badge badge-gray" style="margin-left:auto;font-size:10px">SMS-Code</span>
+          </button>
+        </div>
+
+        <!-- SCREEN: EMAIL -->
+        <div class="auth-screen" id="asc-email">
+          <button class="back-btn" onclick="goAuthScreen('asc-choice')">← Zurück</button>
+          <div class="progress-dots"><div class="pdot done"></div><div class="pdot active"></div><div class="pdot"></div></div>
+          <h3 class="auth-heading" id="email-heading">Konto erstellen</h3>
+          <p class="auth-subheading">Wir senden dir einen Bestätigungscode per E-Mail.</p>
+          <div class="field">
+            <label class="label">Vollständiger Name</label>
+            <input class="input" type="text" id="inp-name" placeholder="Max Muster" oninput="validateEmailForm()">
+          </div>
+          <div class="field">
+            <label class="label">E-Mail-Adresse</label>
+            <input class="input" type="email" id="inp-email" placeholder="max@beispiel.ch" oninput="validateEmailForm()">
+          </div>
+          <div class="field">
+            <label class="label">Passwort</label>
+            <div class="pw-wrap">
+              <input class="input" type="password" id="inp-pw" placeholder="Min. 8 Zeichen" oninput="checkStrength();validateEmailForm()">
+              <button class="pw-eye" onclick="togglePw('inp-pw',this)" type="button">👁</button>
+            </div>
+            <div class="strength-row" id="str-bars">
+              <div class="str-bar" id="sb1"></div><div class="str-bar" id="sb2"></div>
+              <div class="str-bar" id="sb3"></div><div class="str-bar" id="sb4"></div>
+            </div>
+            <div class="str-label" id="str-label"></div>
+          </div>
+          <label class="check-label"><input type="checkbox" id="chk-terms" onchange="validateEmailForm()"> Ich akzeptiere die <a href="#" style="color:var(--gold)">AGB</a> und <a href="#" style="color:var(--gold)">Datenschutzrichtlinie</a>.</label>
+          <label class="check-label"><input type="checkbox" id="chk-news"> Ja, ich möchte Neuheiten & Angebote erhalten.</label>
+          <button class="btn btn-primary btn-full btn-lg" id="submit-email-btn" onclick="submitEmail()" disabled style="margin-top:8px">Bestätigungsmail senden →</button>
+        </div>
+
+        <!-- SCREEN: EMAIL OTP -->
+        <div class="auth-screen" id="asc-email-verify">
+          <button class="back-btn" onclick="goAuthScreen('asc-email')">← Zurück</button>
+          <div class="progress-dots"><div class="pdot done"></div><div class="pdot done"></div><div class="pdot active"></div></div>
+          <h3 class="auth-heading">E-Mail bestätigen</h3>
+          <p class="auth-subheading">Wir haben dir einen 6-stelligen Code gesendet an <strong id="verify-email-target" style="color:var(--gold)"></strong></p>
+          <div class="info-alert">📬 Prüfe auch deinen Spam-Ordner. Der Code ist 10 Minuten gültig.</div>
+          <div class="otp-row" id="otp-email"></div>
+          <button class="btn btn-primary btn-full btn-lg" onclick="submitOTP('email')">Code bestätigen →</button>
+          <div class="resend-row">
+            <button class="resend-btn" id="resend-email-btn" onclick="resendEmail()" disabled>Code erneut senden</button>
+            <span id="cd-email" style="color:var(--text3);font-size:12px"> (30s)</span>
+          </div>
+        </div>
+
+        <!-- SCREEN: PHONE -->
+        <div class="auth-screen" id="asc-phone">
+          <button class="back-btn" onclick="goAuthScreen('asc-choice')">← Zurück</button>
+          <div class="progress-dots"><div class="pdot done"></div><div class="pdot active"></div><div class="pdot"></div></div>
+          <h3 class="auth-heading">Handynummer eingeben</h3>
+          <p class="auth-subheading">Du erhältst einen SMS-Code zur Bestätigung.</p>
+          <div class="field">
+            <label class="label">Handynummer</label>
+            <div class="phone-row">
+              <select class="cc-sel" id="cc-sel">
+                <option value="+41">🇨🇭 +41</option>
+                <option value="+49">🇩🇪 +49</option>
+                <option value="+43">🇦🇹 +43</option>
+                <option value="+33">🇫🇷 +33</option>
+                <option value="+39">🇮🇹 +39</option>
+              </select>
+              <input class="input phone-input" type="tel" id="inp-phone" placeholder="79 123 45 67" oninput="validatePhone()">
+            </div>
+          </div>
+          <div class="info-alert">📱 Standard SMS-Tarife können anfallen. Der Code ist 5 Minuten gültig.</div>
+          <button class="btn btn-primary btn-full btn-lg" id="send-sms-btn" onclick="sendSMS()" disabled>SMS-Code senden →</button>
+        </div>
+
+        <!-- SCREEN: PHONE OTP -->
+        <div class="auth-screen" id="asc-phone-verify">
+          <button class="back-btn" onclick="goAuthScreen('asc-phone')">← Zurück</button>
+          <div class="progress-dots"><div class="pdot done"></div><div class="pdot done"></div><div class="pdot active"></div></div>
+          <h3 class="auth-heading">SMS-Code eingeben</h3>
+          <p class="auth-subheading">Code wurde gesendet an <strong id="verify-phone-target" style="color:var(--gold)"></strong></p>
+          <div class="otp-row" id="otp-phone"></div>
+          <button class="btn btn-primary btn-full btn-lg" onclick="submitOTP('phone')">Code bestätigen →</button>
+          <div class="resend-row">
+            <button class="resend-btn" id="resend-phone-btn" onclick="resendSMS()" disabled>Code erneut senden</button>
+            <span id="cd-phone" style="color:var(--text3);font-size:12px"> (30s)</span>
+          </div>
+        </div>
+
+        <!-- SCREEN: SUCCESS -->
+        <div class="auth-screen" id="asc-success">
+          <div class="success-box">
+            <div class="success-icon">✅</div>
+            <h3 class="auth-heading" id="suc-heading">Konto verifiziert!</h3>
+            <p class="auth-subheading" id="suc-subheading">Dein Konto ist bereit. Du kannst jetzt bestellen.</p>
+            <button class="btn btn-primary btn-full btn-lg" onclick="showPage('dash')">Zum Dashboard →</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── DASHBOARD ──────────────────────────────────────── -->
+<div class="page" id="page-dash">
+  <div class="dash-layout">
+    <div class="dash-sidebar">
+      <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text2);padding:8px 14px 16px;border-bottom:1px solid var(--border);margin-bottom:8px">
+        <div id="dash-user-name" style="color:var(--text);font-size:15px;margin-bottom:2px">Gast</div>
+        <div id="dash-user-email" style="font-size:11px;font-weight:400;color:var(--text3)">Nicht eingeloggt</div>
+      </div>
+      <button class="dash-nav-item active" onclick="showDashTab('overview',this)">📊 Übersicht</button>
+      <button class="dash-nav-item" onclick="showDashTab('orders',this)">📦 Bestellungen</button>
+      <button class="dash-nav-item" onclick="showDashTab('configs',this)">💡 Konfigurationen</button>
+      <button class="dash-nav-item" onclick="showDashTab('profile',this)">👤 Profil</button>
+      <div class="dash-nav-section">Aktionen</div>
+      <button class="dash-nav-item" onclick="showPage('config')">+ Neue Konfiguration</button>
+      <button class="dash-nav-item" onclick="logout()">🚪 Abmelden</button>
+    </div>
+    <div class="dash-content">
+
+      <!-- OVERVIEW TAB -->
+      <div class="dash-tab active" id="dt-overview">
+        <div class="dash-header">
+          <div class="dash-welcome" id="dash-welcome-txt">Willkommen zurück 👋</div>
+          <div class="dash-sub">Hier ist deine Übersicht</div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-box"><div class="stat-box-label">Bestellungen</div><div class="stat-box-val" id="ds-orders">0</div><div class="stat-box-sub">Gesamt</div></div>
+          <div class="stat-box"><div class="stat-box-label">Ausgegeben</div><div class="stat-box-val" id="ds-spent">CHF 0</div><div class="stat-box-sub">Gesamt</div></div>
+          <div class="stat-box"><div class="stat-box-label">Konfigurationen</div><div class="stat-box-val" id="ds-configs">0</div><div class="stat-box-sub">Gespeichert</div></div>
+          <div class="stat-box"><div class="stat-box-label">Status</div><div class="stat-box-val" style="color:var(--green);font-size:16px">Aktiv ✓</div><div class="stat-box-sub">Verifiziert</div></div>
+        </div>
+        <div class="section-header"><div class="section-title" style="font-size:16px">Letzte Bestellungen</div></div>
+        <div id="dash-recent-orders"></div>
+      </div>
+
+      <!-- ORDERS TAB -->
+      <div class="dash-tab" id="dt-orders">
+        <div class="dash-header"><div class="dash-welcome">Bestellungen</div></div>
+        <div id="dash-orders-list"></div>
+      </div>
+
+      <!-- CONFIGS TAB -->
+      <div class="dash-tab" id="dt-configs">
+        <div class="dash-header"><div class="dash-welcome">Gespeicherte Konfigurationen</div></div>
+        <div id="dash-configs-list"></div>
+      </div>
+
+      <!-- PROFILE TAB -->
+      <div class="dash-tab" id="dt-profile">
+        <div class="dash-header"><div class="dash-welcome">Profil</div></div>
+        <div class="profile-grid">
+          <div class="profile-card">
+            <div class="profile-card-title">Persönliche Daten</div>
+            <div class="field"><label class="label">Name</label><input class="input" type="text" id="prof-name" placeholder="Dein Name"></div>
+            <div class="field"><label class="label">E-Mail</label><input class="input" type="email" id="prof-email" placeholder="deine@email.ch" readonly style="opacity:0.5"></div>
+            <div class="field"><label class="label">Telefon</label><input class="input" type="tel" id="prof-phone" placeholder="+41 79 123 45 67"></div>
+            <div class="field"><label class="label">Sprache</label>
+              <select class="select" id="prof-lang">
+                <option value="de">Deutsch</option>
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="saveProfile()">Speichern</button>
+          </div>
+          <div class="profile-card">
+            <div class="profile-card-title">Lieferadresse</div>
+            <div class="field"><label class="label">Strasse & Nr.</label><input class="input" type="text" id="prof-street" placeholder="Musterstrasse 1"></div>
+            <div class="field"><label class="label">PLZ & Ort</label><div style="display:grid;grid-template-columns:100px 1fr;gap:8px"><input class="input" type="text" id="prof-plz" placeholder="3000"><input class="input" type="text" id="prof-city" placeholder="Bern"></div></div>
+            <div class="field"><label class="label">Land</label>
+              <select class="select" id="prof-country">
+                <option value="CH">🇨🇭 Schweiz</option>
+                <option value="DE">🇩🇪 Deutschland</option>
+                <option value="AT">🇦🇹 Österreich</option>
+                <option value="FR">🇫🇷 Frankreich</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="saveProfile()">Adresse speichern</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── CHECKOUT ────────────────────────────────────────── -->
+<div class="page" id="page-checkout">
+  <div style="max-width:960px;margin:0 auto;padding:32px 40px">
+
+    <!-- STRIPE KEY CONFIG BAR -->
+    <div id="stripe-config-bar" style="background:rgba(99,91,255,0.08);border:1px solid rgba(99,91,255,0.25);border-radius:var(--r2);padding:12px 18px;margin-bottom:24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <span style="font-size:13px;font-weight:600;color:#a89fff">⚡ Stripe</span>
+      <input id="stripe-pk-inp" class="input" placeholder="Publishable Key (pk_live_… oder pk_test_…)" style="flex:1;min-width:260px;max-width:420px;font-size:12px;padding:7px 12px">
+      <button class="btn btn-sm" style="background:#635bff;color:#fff;border:none" onclick="initStripe()">Verbinden</button>
+      <div id="stripe-status" style="font-size:12px;padding:3px 10px;border-radius:20px;background:rgba(232,85,85,0.1);color:var(--red);border:1px solid rgba(232,85,85,0.2)">● Nicht verbunden · Demo-Modus</div>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('stripe-config-bar').style.display='none'">Ausblenden</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 360px;gap:32px">
+    <div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:28px">Kasse</h2>
+
+      <!-- STEP 1: ADDRESS -->
+      <div class="checkout-section">
+        <div class="checkout-section-title" style="display:flex;align-items:center;gap:8px"><span style="width:22px;height:22px;border-radius:50%;background:var(--gold);color:#000;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif">1</span> Lieferadresse</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="field"><label class="label">Vorname</label><input class="input" type="text" id="co-fname" placeholder="Max" oninput="validateCheckout()"></div>
+          <div class="field"><label class="label">Nachname</label><input class="input" type="text" id="co-lname" placeholder="Muster" oninput="validateCheckout()"></div>
+          <div class="field" style="grid-column:1/-1"><label class="label">Strasse & Nr.</label><input class="input" type="text" id="co-street" placeholder="Musterstrasse 12"></div>
+          <div class="field"><label class="label">PLZ</label><input class="input" type="text" id="co-plz" placeholder="4000"></div>
+          <div class="field"><label class="label">Ort</label><input class="input" type="text" id="co-city" placeholder="Basel"></div>
+          <div class="field"><label class="label">Land</label><select class="select" id="co-country"><option value="CH">🇨🇭 Schweiz</option><option value="DE">🇩🇪 Deutschland</option><option value="AT">🇦🇹 Österreich</option><option value="FR">🇫🇷 Frankreich</option></select></div>
+          <div class="field" style="grid-column:1/-1"><label class="label">E-Mail (Auftragsbestätigung)</label><input class="input" type="email" id="co-email" placeholder="max@beispiel.ch" oninput="validateCheckout()"></div>
+          <div class="field" style="grid-column:1/-1"><label class="label">Telefon</label><input class="input" type="tel" id="co-phone" placeholder="+41 79 123 45 67"></div>
+        </div>
+      </div>
+
+      <!-- STEP 2: PAYMENT METHOD -->
+      <div class="checkout-section">
+        <div class="checkout-section-title" style="display:flex;align-items:center;gap:8px"><span style="width:22px;height:22px;border-radius:50%;background:var(--gold);color:#000;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif">2</span> Zahlungsart</div>
+
+        <!-- PAYMENT METHOD TABS -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px">
+          <div class="pay-opt selected" id="pay-card" onclick="selectPay('card')" style="cursor:pointer">
+            <div style="font-size:22px;margin-bottom:6px">💳</div>
+            <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700">Kreditkarte</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:3px">Visa · MC · Amex</div>
+          </div>
+          <div class="pay-opt" id="pay-twint" onclick="selectPay('twint')" style="cursor:pointer">
+            <div style="font-size:22px;margin-bottom:6px">📱</div>
+            <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700">TWINT</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:3px">QR-Code · App</div>
+          </div>
+          <div class="pay-opt" id="pay-invoice" onclick="selectPay('invoice')" style="cursor:pointer">
+            <div style="font-size:22px;margin-bottom:6px">🧾</div>
+            <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700">Rechnung</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:3px">30 Tage netto</div>
+          </div>
+        </div>
+
+        <!-- KREDITKARTE FIELDS -->
+        <div id="pay-card-fields">
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:18px">
+            <!-- Stripe Elements mount here in live mode, demo form otherwise -->
+            <div id="stripe-card-element" style="display:none"></div>
+            <div id="demo-card-form">
+              <div class="field"><label class="label">Karteninhaber</label><input class="input" id="card-name" type="text" placeholder="Max Muster" oninput="validateCheckout()"></div>
+              <div class="field">
+                <label class="label">Kartennummer</label>
+                <div style="display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color 0.2s" id="card-nr-wrap">
+                  <input class="input" id="card-nr" type="text" placeholder="0000 0000 0000 0000" maxlength="19" style="border:none" oninput="formatCardNr(this);validateCheckout()">
+                  <span id="card-brand-icon" style="padding-right:12px;font-size:18px">💳</span>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+                <div class="field" style="grid-column:span 2"><label class="label">Ablaufdatum</label><input class="input" id="card-exp" type="text" placeholder="MM / JJ" maxlength="7" oninput="formatCardExp(this);validateCheckout()"></div>
+                <div class="field"><label class="label">CVV</label>
+                  <div style="display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
+                    <input class="input" id="card-cvv" type="text" placeholder="•••" maxlength="4" style="border:none" oninput="validateCheckout()">
+                    <span style="padding-right:10px;font-size:14px;color:var(--text3)">🔒</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:11px;color:var(--text3)">
+              <span>🔒</span> SSL-verschlüsselt · PCI DSS compliant via Stripe · Karte wird nie gespeichert
+            </div>
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Visa.svg/1200px-Visa.svg.png" alt="Visa" style="height:20px;opacity:0.6;filter:grayscale(1)">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" alt="Mastercard" style="height:20px;opacity:0.6;filter:grayscale(1)">
+              <span style="font-size:11px;color:var(--text3);padding-top:3px">American Express · Discover</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TWINT FIELDS -->
+        <div id="pay-twint-fields" class="hidden">
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:24px;text-align:center">
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:16px">Bezahle bequem mit TWINT</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:380px;margin:0 auto">
+              <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:16px;text-align:center">
+                <div style="font-size:28px;margin-bottom:8px">📱</div>
+                <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:4px">Mobile</div>
+                <div style="font-size:12px;color:var(--text2);line-height:1.5">App öffnet automatisch nach Klick auf "Bezahlen"</div>
+              </div>
+              <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:16px;text-align:center">
+                <div style="font-size:28px;margin-bottom:8px">🔲</div>
+                <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:4px">Desktop</div>
+                <div style="font-size:12px;color:var(--text2);line-height:1.5">QR-Code mit TWINT App scannen um zu bezahlen</div>
+              </div>
+            </div>
+            <div id="twint-qr-area" style="margin-top:20px;display:none">
+              <div style="font-size:12px;color:var(--text2);margin-bottom:12px">QR-Code mit TWINT App scannen:</div>
+              <canvas id="twint-qr" style="border:4px solid #fff;border-radius:8px;width:160px;height:160px;background:#fff"></canvas>
+              <div style="font-size:12px;color:var(--text3);margin-top:8px" id="twint-timer">Gültig für: 10:00</div>
+            </div>
+            <div style="margin-top:16px;font-size:11px;color:var(--text3)">
+              <i class="ti ti-info-circle" aria-hidden="true"></i> TWINT hat über 6 Mio. Nutzer in der Schweiz · Sofortüberweisung · Keine Kreditkarte nötig
+            </div>
+          </div>
+        </div>
+
+        <!-- RECHNUNG FIELDS -->
+        <div id="pay-invoice-fields" class="hidden">
+          <div style="background:var(--gold-dim);border:1px solid rgba(232,184,75,0.3);border-radius:var(--r2);padding:20px">
+            <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--gold);margin-bottom:10px">🧾 Zahlung auf Rechnung</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.7">
+              ✓ Zahlungsziel: 30 Tage netto<br>
+              ✓ Rechnung per E-Mail nach Lieferung<br>
+              ✓ QR-Rechnung (Schweizer Standard)<br>
+              ✓ Überweisung auf IBAN CH56 0483 5012 3456 7800 9<br>
+              <span style="color:var(--text3);font-size:12px">Nur für registrierte Kunden verfügbar · Vorbehalt Bonitätsprüfung</span>
+            </div>
+            <div class="field" style="margin-top:14px;margin-bottom:0"><label class="label">Firmenname / Rechnungsadresse (falls abweichend)</label><input class="input" id="inv-company" placeholder="Optional: Muster AG"></div>
+          </div>
+        </div>
+
+        <!-- CARD ERROR -->
+        <div id="card-error" style="display:none;background:rgba(232,85,85,0.1);border:1px solid rgba(232,85,85,0.25);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--red);margin-top:10px"></div>
+
+        <!-- 3DS INFO -->
+        <div style="margin-top:12px;font-size:12px;color:var(--text3);display:flex;align-items:center;gap:6px">
+          <span>🛡</span> 3D Secure Authentifizierung wird automatisch ausgelöst bei Bedarf
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: ORDER SUMMARY -->
+    <div>
+      <div class="card" style="padding:24px;position:sticky;top:80px">
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)">Bestellübersicht</div>
+        <div id="co-items-list" style="margin-bottom:12px"></div>
+        <div class="divider"></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:5px"><span>Zwischensumme</span><span id="co-sub">CHF 0</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:5px"><span>Lieferung</span><span id="co-shipping">CHF 0</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:12px"><span>MwSt. (7.7%)</span><span id="co-vat">CHF 0</span></div>
+        <div style="display:flex;justify-content:space-between;font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:20px;padding-top:12px;border-top:1px solid var(--border)"><span>Total</span><span style="color:var(--gold)" id="co-total">CHF 0</span></div>
+
+        <button class="btn btn-primary btn-full btn-lg" id="pay-now-btn" onclick="processPayment()" disabled>
+          <span id="pay-btn-icon">🔒</span>
+          <span id="pay-btn-txt">Jetzt bezahlen</span>
+        </button>
+
+        <!-- PROCESSING STATE -->
+        <div id="pay-processing" style="display:none;text-align:center;padding:16px 0">
+          <div style="font-size:20px;margin-bottom:8px;animation:spin 1s linear infinite;display:inline-block">⟳</div>
+          <div style="font-size:13px;color:var(--text2)" id="pay-processing-txt">Zahlung wird verarbeitet…</div>
+        </div>
+
+        <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:10px;line-height:1.6">
+          🔒 Verschlüsselt via Stripe · PCI DSS Level 1<br>
+          Stripe ist <a href="https://stripe.com/ch" style="color:var(--text2)">in der Schweiz zugelassen</a>
+        </div>
+
+        <!-- PAYMENT METHOD LOGOS -->
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
+          <span style="font-size:11px;color:var(--text3)">Akzeptiert:</span>
+          <span style="font-size:11px;color:var(--text2);font-weight:600">VISA</span>
+          <span style="font-size:11px;color:var(--text2);font-weight:600">MC</span>
+          <span style="font-size:11px;color:var(--text2);font-weight:600">AMEX</span>
+          <span style="font-size:13px">📱</span>
+          <span style="font-size:11px;color:var(--text2);font-weight:600">TWINT</span>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ORDER CONFIRM ──────────────────────────────────── -->
+<div class="page" id="page-confirm">
+  <div class="order-confirm-box">
+    <div class="order-confirm-icon">✅</div>
+    <div class="order-num">Bestellnummer: <span id="confirm-order-num">#LS-2026-0001</span></div>
+    <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin:12px 0 8px">Bestellung eingegangen!</h2>
+    <p style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:24px" id="confirm-details">Deine Auftragsbestätigung wurde per E-Mail gesendet. Wir melden uns bei dir.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button class="btn btn-dark" onclick="showPage('home')">← Zum Shop</button>
+      <button class="btn btn-primary" onclick="requireAuth('dash')">Bestellverlauf →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── ADMIN ──────────────────────────────────────────── -->
+<div class="page" id="page-admin">
+  <div class="admin-layout">
+    <div class="dash-sidebar">
+      <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text2);padding:8px 14px 16px;border-bottom:1px solid var(--border);margin-bottom:8px">
+        <div style="color:var(--red);font-size:15px;margin-bottom:2px">Admin Panel</div>
+        <div style="font-size:11px;font-weight:400;color:var(--text3)">LEDStrip Pro</div>
+      </div>
+      <button class="dash-nav-item active" onclick="showAdminTab('orders',this)">📦 Bestellungen</button>
+      <button class="dash-nav-item" onclick="showAdminTab('customers',this)">👥 Kunden</button>
+      <button class="dash-nav-item" onclick="showAdminTab('stats',this)">📈 Statistiken</button>
+      <div class="dash-nav-section">System</div>
+      <button class="dash-nav-item" onclick="showPage('home')">← Zum Shop</button>
+    </div>
+    <div class="dash-content">
+      <div class="dash-tab active" id="at-orders">
+        <div class="dash-header"><div class="dash-welcome">Alle Bestellungen</div></div>
+        <div style="margin-bottom:16px;display:flex;gap:10px">
+          <input class="input" type="text" placeholder="Suchen…" style="max-width:280px" oninput="filterAdminOrders(this.value)">
+          <select class="select" style="max-width:160px" onchange="filterAdminStatus(this.value)">
+            <option value="">Alle Status</option>
+            <option>pending</option><option>confirmed</option><option>in_production</option><option>shipped</option><option>delivered</option>
+          </select>
+        </div>
+        <div id="admin-orders-list"></div>
+      </div>
+      <div class="dash-tab" id="at-customers">
+        <div class="dash-header"><div class="dash-welcome">Kunden</div></div>
+        <div id="admin-customers-list"></div>
+      </div>
+      <div class="dash-tab" id="at-stats">
+        <div class="dash-header"><div class="dash-welcome">Statistiken</div></div>
+        <div class="stats-grid">
+          <div class="stat-box"><div class="stat-box-label">Bestellungen total</div><div class="stat-box-val" id="adm-total-orders">0</div></div>
+          <div class="stat-box"><div class="stat-box-label">Umsatz total</div><div class="stat-box-val" id="adm-revenue">CHF 0</div></div>
+          <div class="stat-box"><div class="stat-box-label">Kunden</div><div class="stat-box-val" id="adm-customers">0</div></div>
+          <div class="stat-box"><div class="stat-box-label">Ausstehend</div><div class="stat-box-val" id="adm-pending">0</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── RECHNUNGEN ─────────────────────────────────────── -->
+<div class="page" id="page-invoices">
+  <div class="dash-layout">
+    <div class="dash-sidebar">
+      <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text2);padding:8px 14px 16px;border-bottom:1px solid var(--border);margin-bottom:8px">
+        <div style="color:var(--gold);font-size:15px;margin-bottom:2px">🧾 Rechnungen</div>
+        <div style="font-size:11px;font-weight:400;color:var(--text3)">LEDStrip Pro</div>
+      </div>
+      <button class="dash-nav-item active" id="inv-nav-list" onclick="showInvTab('list',this)">📋 Alle Rechnungen</button>
+      <button class="dash-nav-item" id="inv-nav-new" onclick="showInvTab('new',this)">+ Neue Rechnung</button>
+      <button class="dash-nav-item" id="inv-nav-settings" onclick="showInvTab('settings',this)">⚙ Einstellungen</button>
+      <div class="dash-nav-section">Schnellzugriff</div>
+      <button class="dash-nav-item" onclick="showPage('dash')">← Dashboard</button>
+    </div>
+    <div class="dash-content">
+
+      <!-- LIST -->
+      <div class="dash-tab active" id="invt-list">
+        <div class="dash-header">
+          <div class="dash-welcome">Rechnungen</div>
+          <div class="dash-sub">Alle Rechnungen auf einen Blick</div>
+        </div>
+        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px">
+          <div class="stat-box"><div class="stat-box-label">Offen</div><div class="stat-box-val" id="inv-stat-open" style="color:var(--gold)">CHF 0</div></div>
+          <div class="stat-box"><div class="stat-box-label">Bezahlt (Monat)</div><div class="stat-box-val" id="inv-stat-paid" style="color:var(--green)">CHF 0</div></div>
+          <div class="stat-box"><div class="stat-box-label">Überfällig</div><div class="stat-box-val" id="inv-stat-overdue" style="color:var(--red)">0</div></div>
+          <div class="stat-box"><div class="stat-box-label">Total Rechnungen</div><div class="stat-box-val" id="inv-stat-total">0</div></div>
+        </div>
+        <div class="inv-toolbar">
+          <input class="input" type="text" placeholder="Suchen…" style="max-width:220px" oninput="filterInvoices(this.value)">
+          <select class="select" style="max-width:160px" onchange="filterInvoiceStatus(this.value)">
+            <option value="">Alle Status</option>
+            <option value="draft">Entwurf</option>
+            <option value="sent">Gesendet</option>
+            <option value="paid">Bezahlt</option>
+            <option value="overdue">Überfällig</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="showInvTab('new',document.getElementById('inv-nav-new'))">+ Neue Rechnung</button>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);overflow:hidden">
+          <table class="inv-table">
+            <thead><tr><th>Nr.</th><th>Kunde</th><th>Datum</th><th>Fällig</th><th>Betrag</th><th>Status</th><th>Aktionen</th></tr></thead>
+            <tbody id="invoices-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- NEW INVOICE -->
+      <div class="dash-tab" id="invt-new">
+        <div class="dash-header"><div class="dash-welcome">Neue Rechnung</div></div>
+        <div class="inv-form">
+          <div class="inv-form-title">Rechnungsdetails</div>
+          <div class="inv-grid2" style="margin-bottom:14px">
+            <div class="field"><label class="label">Rechnungsnummer</label><input class="input" type="text" id="inv-nr" placeholder="z.B. RE-2026-001" value="RE-2026-001"></div>
+            <div class="field"><label class="label">Rechnungsdatum</label><input class="input" type="date" id="inv-date"></div>
+            <div class="field"><label class="label">Zahlungsziel</label><select class="select" id="inv-due">
+              <option value="10">10 Tage netto</option>
+              <option value="20">20 Tage netto</option>
+              <option value="30" selected>30 Tage netto</option>
+              <option value="60">60 Tage netto</option>
+            </select></div>
+            <div class="field"><label class="label">Währung</label><select class="select" id="inv-currency">
+              <option value="CHF">CHF (Schweizer Franken)</option>
+              <option value="EUR">EUR (Euro)</option>
+            </select></div>
+          </div>
+          <div class="divider"></div>
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:14px">Empfänger</div>
+          <div class="inv-grid2" style="margin-bottom:14px">
+            <div class="field"><label class="label">Firmenname / Name</label><input class="input" type="text" id="inv-cname" placeholder="Muster AG"></div>
+            <div class="field"><label class="label">Kontaktperson</label><input class="input" type="text" id="inv-ccontact" placeholder="Max Muster"></div>
+            <div class="field"><label class="label">E-Mail</label><input class="input" type="email" id="inv-cemail" placeholder="max@firma.ch"></div>
+            <div class="field"><label class="label">Telefon</label><input class="input" type="tel" id="inv-cphone" placeholder="+41 79 123 45 67"></div>
+            <div class="field"><label class="label">Strasse & Nr.</label><input class="input" type="text" id="inv-cstreet" placeholder="Musterstrasse 1"></div>
+            <div class="field"><label class="label">PLZ & Ort</label><div style="display:grid;grid-template-columns:80px 1fr;gap:8px"><input class="input" type="text" id="inv-cplz" placeholder="3000"><input class="input" type="text" id="inv-ccity" placeholder="Bern"></div></div>
+          </div>
+          <div class="divider"></div>
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:14px">Positionen</div>
+          <div style="overflow-x:auto">
+            <table class="inv-items-table" id="inv-items-table">
+              <thead><tr><th style="min-width:260px">Beschreibung</th><th style="width:80px">Menge</th><th style="width:80px">Einheit</th><th style="width:110px">Einzelpreis</th><th style="width:80px">MwSt.</th><th style="width:100px">Total</th><th style="width:40px"></th></tr></thead>
+              <tbody id="inv-items-tbody"></tbody>
+            </table>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="addInvItem()">+ Position hinzufügen</button>
+          <div class="inv-total-row" id="inv-total-row">
+            <span style="color:var(--text2);font-size:13px">Zwischensumme: <strong id="inv-subtotal" style="color:var(--text)">CHF 0.00</strong></span>
+            <span style="color:var(--text2);font-size:13px">MwSt.: <strong id="inv-vat-total" style="color:var(--text)">CHF 0.00</strong></span>
+            <span>Total: <strong id="inv-grand-total">CHF 0.00</strong></span>
+          </div>
+          <div class="divider"></div>
+          <div class="field"><label class="label">Bemerkungen / Zahlungsinformationen</label>
+            <textarea class="input" id="inv-notes" rows="3" placeholder="Bankverbindung: IBAN CH56 0483 5012 3456 7800 9&#10;Bank: UBS AG, 4001 Basel&#10;Kontoinhaber: LEDStrip Pro GmbH"></textarea>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+            <button class="btn btn-primary btn-lg" onclick="saveInvoice('sent')">💾 Speichern & Senden</button>
+            <button class="btn btn-dark" onclick="saveInvoice('draft')">Entwurf speichern</button>
+            <button class="btn btn-ghost" onclick="previewInvoice()">👁 Vorschau</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="dash-tab" id="invt-settings">
+        <div class="dash-header"><div class="dash-welcome">Rechnungseinstellungen</div></div>
+        <div class="inv-form" style="max-width:600px">
+          <div class="inv-form-title">Absender-Daten</div>
+          <div class="inv-grid2">
+            <div class="field"><label class="label">Firmenname</label><input class="input" id="biz-name" value="LEDStrip Pro GmbH"></div>
+            <div class="field"><label class="label">UID / MwSt-Nr.</label><input class="input" id="biz-uid" placeholder="CHE-123.456.789 MWST"></div>
+            <div class="field"><label class="label">Strasse & Nr.</label><input class="input" id="biz-street" placeholder="Gewerbestrasse 1"></div>
+            <div class="field"><label class="label">PLZ & Ort</label><input class="input" id="biz-city" placeholder="4000 Basel"></div>
+            <div class="field"><label class="label">Telefon</label><input class="input" id="biz-phone" placeholder="+41 61 123 45 67"></div>
+            <div class="field"><label class="label">E-Mail</label><input class="input" id="biz-email" placeholder="info@ledstrip-pro.ch"></div>
+            <div class="field"><label class="label">IBAN</label><input class="input" id="biz-iban" placeholder="CH56 0483 5012 3456 7800 9"></div>
+            <div class="field"><label class="label">Bank</label><input class="input" id="biz-bank" placeholder="UBS AG, 4001 Basel"></div>
+          </div>
+          <div class="divider"></div>
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:14px">Nächste Rechnungsnummer</div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <input class="input" id="inv-next-nr" value="1" style="max-width:100px;text-align:center">
+            <span style="color:var(--text2);font-size:13px">→ Nächste: <strong id="next-nr-preview" style="color:var(--gold)">RE-2026-001</strong></span>
+          </div>
+          <button class="btn btn-primary" style="margin-top:20px" onclick="saveBizSettings()">Einstellungen speichern</button>
+        </div>
+      </div>
+
+      <!-- PREVIEW -->
+      <div class="dash-tab" id="invt-preview">
+        <div class="dash-header" style="display:flex;align-items:center;gap:12px">
+          <button class="btn btn-ghost btn-sm" onclick="showInvTab('new',document.getElementById('inv-nav-new'))">← Zurück</button>
+          <div class="dash-welcome" style="margin-bottom:0">Rechnungsvorschau</div>
+          <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="printInvoice()">🖨 Drucken / PDF</button>
+        </div>
+        <div id="pdf-preview-content"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── LAGERVERWALTUNG ────────────────────────────────── -->
+<div class="page" id="page-inventory">
+  <div class="dash-layout">
+    <div class="dash-sidebar">
+      <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text2);padding:8px 14px 16px;border-bottom:1px solid var(--border);margin-bottom:8px">
+        <div style="color:var(--gold);font-size:15px;margin-bottom:2px">📦 Lagerverwaltung</div>
+        <div style="font-size:11px;font-weight:400;color:var(--text3)">LEDStrip Pro</div>
+      </div>
+      <button class="dash-nav-item active" id="lager-nav-stock" onclick="showLagerTab('stock',this)">📊 Lagerbestand</button>
+      <button class="dash-nav-item" id="lager-nav-in" onclick="showLagerTab('in',this)">📥 Wareneingang</button>
+      <button class="dash-nav-item" id="lager-nav-out" onclick="showLagerTab('out',this)">📤 Warenausgang</button>
+      <button class="dash-nav-item" id="lager-nav-history" onclick="showLagerTab('history',this)">📋 Bewegungen</button>
+      <button class="dash-nav-item" id="lager-nav-products" onclick="showLagerTab('products',this)">⚙ Artikel verwalten</button>
+      <div class="dash-nav-section">Schnellzugriff</div>
+      <button class="dash-nav-item" onclick="showPage('dash')">← Dashboard</button>
+    </div>
+    <div class="dash-content">
+
+      <!-- STOCK OVERVIEW -->
+      <div class="dash-tab active" id="lagert-stock">
+        <div class="dash-header"><div class="dash-welcome">Lagerbestand</div><div class="dash-sub">Aktueller Bestand aller Artikel</div></div>
+        <div class="inv-stats" id="lager-stats"></div>
+        <div id="lager-alerts"></div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+          <input class="input" type="text" placeholder="Artikel suchen…" style="max-width:240px" oninput="filterStock(this.value)">
+          <select class="select" style="max-width:180px" onchange="filterStockCat(this.value)">
+            <option value="">Alle Kategorien</option>
+            <option value="led">LED-Bänder</option>
+            <option value="profil">Alu-Profile</option>
+            <option value="netzteil">Netzteile</option>
+            <option value="dimmer">Dimmer/Steuerung</option>
+            <option value="zubehoer">Zubehör</option>
+          </select>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);overflow:hidden">
+          <table class="stock-table">
+            <thead><tr><th>Artikel</th><th>Kategorie</th><th>Bestand</th><th>Min-Bestand</th><th>Lagerstand</th><th>Einkaufspreis</th><th>Lagerwert</th><th>Aktionen</th></tr></thead>
+            <tbody id="stock-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- WARENEINGANG -->
+      <div class="dash-tab" id="lagert-in">
+        <div class="dash-header"><div class="dash-welcome">📥 Wareneingang</div><div class="dash-sub">Neue Lieferung einbuchen</div></div>
+        <div class="inv-form" style="max-width:580px">
+          <div class="inv-form-title">Wareneingang erfassen</div>
+          <div class="field"><label class="label">Artikel</label>
+            <select class="select" id="in-product" onchange="updateInPreview()">
+              <option value="">Artikel wählen…</option>
+            </select>
+          </div>
+          <div class="inv-grid2">
+            <div class="field"><label class="label">Menge</label>
+              <div style="display:flex;align-items:center;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
+                <input class="input" type="number" id="in-qty" min="0.1" step="0.1" placeholder="z.B. 100" oninput="updateInPreview()" style="border:none">
+                <span id="in-unit" style="padding-right:12px;font-size:12px;color:var(--text3);white-space:nowrap">Meter</span>
+              </div>
+            </div>
+            <div class="field"><label class="label">Einkaufspreis (pro Einheit)</label>
+              <div style="display:flex;align-items:center;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
+                <input class="input" type="number" id="in-price" min="0" step="0.01" placeholder="z.B. 0.95" oninput="updateInPreview()" style="border:none">
+                <span style="padding-right:12px;font-size:12px;color:var(--text3)">CHF</span>
+              </div>
+            </div>
+            <div class="field"><label class="label">Lieferant</label>
+              <select class="select" id="in-supplier">
+                <option value="LEDYi">LEDYi Lighting</option>
+                <option value="Lightstec">Lightstec</option>
+                <option value="ZBL">ZBL Light</option>
+                <option value="Meanwell">Meanwell / Distrelec</option>
+                <option value="andere">Andere</option>
+              </select>
+            </div>
+            <div class="field"><label class="label">Lieferdatum</label>
+              <input class="input" type="date" id="in-date">
+            </div>
+          </div>
+          <div class="field"><label class="label">Notiz (optional)</label>
+            <input class="input" type="text" id="in-note" placeholder="z.B. Bestellnummer AL-2026-003, Qualität geprüft">
+          </div>
+          <div id="in-preview" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;margin:16px 0;font-size:13px;display:none">
+            <div style="color:var(--text2);margin-bottom:4px">Vorschau</div>
+            <div id="in-preview-text" style="color:var(--green);font-weight:500"></div>
+          </div>
+          <button class="btn btn-primary btn-lg" onclick="bookIn()">📥 Wareneingang buchen</button>
+        </div>
+      </div>
+
+      <!-- WARENAUSGANG -->
+      <div class="dash-tab" id="lagert-out">
+        <div class="dash-header"><div class="dash-welcome">📤 Warenausgang</div><div class="dash-sub">Material ausbuchen (Bestellverbrauch, Verlust, Korrektur)</div></div>
+        <div class="inv-form" style="max-width:580px">
+          <div class="inv-form-title">Warenausgang erfassen</div>
+          <div class="field"><label class="label">Artikel</label>
+            <select class="select" id="out-product">
+              <option value="">Artikel wählen…</option>
+            </select>
+          </div>
+          <div class="inv-grid2">
+            <div class="field"><label class="label">Menge</label>
+              <input class="input" type="number" id="out-qty" min="0.1" step="0.1" placeholder="z.B. 5.5">
+            </div>
+            <div class="field"><label class="label">Grund</label>
+              <select class="select" id="out-reason">
+                <option value="order">Kundenbestellung</option>
+                <option value="install">Installation (Verbrauch)</option>
+                <option value="sample">Muster / Test</option>
+                <option value="loss">Verlust / Bruch</option>
+                <option value="correction">Korrektur</option>
+              </select>
+            </div>
+            <div class="field"><label class="label">Referenz</label>
+              <input class="input" type="text" id="out-ref" placeholder="z.B. Bestellung LS-2026-003">
+            </div>
+            <div class="field"><label class="label">Datum</label>
+              <input class="input" type="date" id="out-date">
+            </div>
+          </div>
+          <div class="field"><label class="label">Notiz (optional)</label>
+            <input class="input" type="text" id="out-note" placeholder="Weitere Informationen…">
+          </div>
+          <button class="btn btn-danger btn-lg" style="margin-top:8px" onclick="bookOut()">📤 Warenausgang buchen</button>
+        </div>
+      </div>
+
+      <!-- HISTORY -->
+      <div class="dash-tab" id="lagert-history">
+        <div class="dash-header"><div class="dash-welcome">📋 Lagerbewegungen</div><div class="dash-sub">Alle Ein- und Ausgänge</div></div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+          <input class="input" type="text" placeholder="Suchen…" style="max-width:220px" oninput="filterMovements(this.value)">
+          <select class="select" style="max-width:150px" onchange="filterMovementType(this.value)">
+            <option value="">Alle Typen</option>
+            <option value="in">Eingang</option>
+            <option value="out">Ausgang</option>
+            <option value="adj">Korrektur</option>
+          </select>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);overflow:hidden">
+          <table class="stock-table">
+            <thead><tr><th>Datum</th><th>Artikel</th><th>Typ</th><th>Menge</th><th>Lieferant / Grund</th><th>Preis/E.</th><th>Wert</th><th>Notiz</th></tr></thead>
+            <tbody id="movements-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PRODUCTS MANAGE -->
+      <div class="dash-tab" id="lagert-products">
+        <div class="dash-header"><div class="dash-welcome">⚙ Artikel verwalten</div></div>
+        <button class="btn btn-primary btn-sm" style="margin-bottom:16px" onclick="showAddProduct()">+ Neuer Artikel</button>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);overflow:hidden">
+          <table class="stock-table">
+            <thead><tr><th>Artikel-Nr.</th><th>Bezeichnung</th><th>Kategorie</th><th>Einheit</th><th>Min-Bestand</th><th>Verkaufspreis</th><th>Aktionen</th></tr></thead>
+            <tbody id="products-manage-tbody"></tbody>
+          </table>
+        </div>
+        <div id="add-product-form" style="display:none;margin-top:20px">
+          <div class="inv-form" style="max-width:640px">
+            <div class="inv-form-title" id="prod-form-title">Neuer Artikel</div>
+            <div class="inv-grid2">
+              <div class="field"><label class="label">Artikel-Nr.</label><input class="input" id="prod-nr" placeholder="z.B. LED-2835-2700K"></div>
+              <div class="field"><label class="label">Bezeichnung</label><input class="input" id="prod-name" placeholder="LED-Band SMD2835 2700K"></div>
+              <div class="field"><label class="label">Kategorie</label>
+                <select class="select" id="prod-cat">
+                  <option value="led">LED-Bänder</option><option value="profil">Alu-Profile</option>
+                  <option value="netzteil">Netzteile</option><option value="dimmer">Dimmer/Steuerung</option>
+                  <option value="zubehoer">Zubehör</option>
+                </select>
+              </div>
+              <div class="field"><label class="label">Einheit</label>
+                <select class="select" id="prod-unit">
+                  <option value="m">Meter (m)</option><option value="Stk.">Stück (Stk.)</option>
+                  <option value="Rolle">Rolle</option><option value="Pkg">Packung</option>
+                </select>
+              </div>
+              <div class="field"><label class="label">Min-Bestand (Alarm)</label><input class="input" id="prod-min" type="number" placeholder="z.B. 20"></div>
+              <div class="field"><label class="label">Einkaufspreis (CHF/E.)</label><input class="input" id="prod-buy" type="number" step="0.01" placeholder="z.B. 0.95"></div>
+              <div class="field"><label class="label">Verkaufspreis (CHF/E.)</label><input class="input" id="prod-sell" type="number" step="0.01" placeholder="z.B. 12.50"></div>
+              <div class="field"><label class="label">Lieferant</label>
+                <select class="select" id="prod-supplier">
+                  <option>LEDYi</option><option>Lightstec</option><option>ZBL</option><option>Meanwell</option><option>Andere</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:16px">
+              <button class="btn btn-primary" onclick="saveProduct()">Speichern</button>
+              <button class="btn btn-ghost" onclick="document.getElementById('add-product-form').style.display='none'">Abbrechen</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL OVERLAY -->
+<div class="modal-overlay hidden" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-box">
+    <div class="modal-title" id="modal-title">Modal</div>
+    <div id="modal-body"></div>
+    <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end" id="modal-actions"></div>
+  </div>
+</div>
+
+</div><!-- /pages -->
+
+<!-- CART OVERLAY -->
+<div id="cart-overlay" class="cart-overlay hidden" onclick="closeCartOutside(event)">
+  <div class="cart-panel" id="cart-panel">
+    <div class="cart-header">
+      <div class="cart-title">🛒 Warenkorb</div>
+      <button class="cart-close" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-body" id="cart-body"></div>
+    <div class="cart-footer">
+      <div class="cart-subtotal"><span>Zwischensumme</span><span id="cart-sub">CHF 0</span></div>
+      <div class="cart-total"><span>Total</span><span id="cart-tot">CHF 0</span></div>
+      <button class="btn btn-primary btn-full btn-lg" onclick="goCheckout()">Zur Kasse →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ── SUPABASE ─────────────────────────────────────────────
+let supabaseClient = null;
+let currentUser = null;
+let demoMode = true;
+
+// Demo data
+let demoOrders = [
+  {id:'LS-2026-0001',temp:'3000K',length_m:4.5,cable_m:1.5,dimmer:'dali',delivery:'express',total_chf:157.40,status:'delivered',created_at:'2026-04-15T10:23:00Z'},
+  {id:'LS-2026-0002',temp:'2700K',length_m:2.0,cable_m:1.0,dimmer:'phase',delivery:'standard',total_chf:68.20,status:'in_production',created_at:'2026-05-08T09:11:00Z'},
+];
+let demoUser = {id:'demo-001',email:'demo@ledstrip.ch',user_metadata:{full_name:'Demo Nutzer'}};
+let savedConfigs = [];
+
+function initSupabase(){
+  const url = document.getElementById('sb-url-inp').value.trim();
+  const key = document.getElementById('sb-key-inp').value.trim();
+  if(!url || !key){toast('Bitte URL und Key eingeben','error');return;}
+  try{
+    supabaseClient = window.supabase.createClient(url, key);
+    demoMode = false;
+    document.getElementById('sb-status').className='sb-status connected';
+    document.getElementById('sb-status-txt').textContent='Verbunden ✓';
+    toast('Supabase verbunden!','success');
+    setupAuthListener();
+  }catch(e){
+    toast('Verbindung fehlgeschlagen: '+e.message,'error');
+  }
+}
+
+function setupAuthListener(){
+  if(!supabaseClient)return;
+  supabaseClient.auth.onAuthStateChange((event, session)=>{
+    if(session?.user){
+      currentUser = session.user;
+      onUserLoggedIn(currentUser);
+    } else {
+      currentUser = null;
+      onUserLoggedOut();
+    }
+  });
+}
+
+async function sbSignUp(email, password, name){
+  if(demoMode){
+    demoUser = {id:'demo-'+Date.now(),email,user_metadata:{full_name:name}};
+    currentUser = demoUser;
+    onUserLoggedIn(currentUser);
+    return {data:{user:demoUser},error:null};
+  }
+  const {data,error} = await supabaseClient.auth.signUp({
+    email, password,
+    options:{data:{full_name:name}}
+  });
+  return {data,error};
+}
+
+async function sbSignIn(email, password){
+  if(demoMode){
+    currentUser = demoUser;
+    onUserLoggedIn(currentUser);
+    return {data:{user:demoUser},error:null};
+  }
+  return await supabaseClient.auth.signInWithPassword({email,password});
+}
+
+async function sbSignInPhone(phone){
+  if(demoMode){
+    currentUser = {...demoUser,phone};
+    onUserLoggedIn(currentUser);
+    return {data:{},error:null};
+  }
+  return await supabaseClient.auth.signInWithOtp({phone});
+}
+
+async function sbVerifyOTP(phone, token){
+  if(demoMode) return {data:{},error:null};
+  return await supabaseClient.auth.verifyOtp({phone,token,type:'sms'});
+}
+
+async function sbSignInApple(){
+  if(demoMode){
+    currentUser = {...demoUser,app_metadata:{provider:'apple'}};
+    onUserLoggedIn(currentUser);
+    return;
+  }
+  await supabaseClient.auth.signInWithOAuth({
+    provider:'apple',
+    options:{redirectTo:window.location.origin+'/auth/callback'}
+  });
+}
+
+async function sbSaveOrder(order){
+  if(demoMode){
+    demoOrders.push({...order,id:'LS-2026-'+String(demoOrders.length+1).padStart(4,'0'),created_at:new Date().toISOString()});
+    return {data:demoOrders[demoOrders.length-1],error:null};
+  }
+  return await supabaseClient.from('orders').insert({...order,user_id:currentUser.id}).select().single();
+}
+
+async function sbGetOrders(){
+  if(demoMode) return demoOrders;
+  const {data} = await supabaseClient.from('orders').select('*').order('created_at',{ascending:false});
+  return data || [];
+}
+
+async function sbUpdateOrderStatus(id, status){
+  if(demoMode){
+    const o = demoOrders.find(x=>x.id===id);
+    if(o) o.status = status;
+    return;
+  }
+  await supabaseClient.from('orders').update({status}).eq('id',id);
+}
+
+function onUserLoggedIn(user){
+  currentUser = user;
+  document.getElementById('auth-btn').style.display='none';
+  document.getElementById('logout-btn').style.display='';
+  document.getElementById('nav-dash').style.display='';
+  document.getElementById('nav-admin').style.display='';
+  document.getElementById('nav-invoices').style.display='';
+  document.getElementById('nav-inventory').style.display='';
+  const name = user.user_metadata?.full_name || user.email || 'Nutzer';
+  document.getElementById('dash-user-name').textContent = name;
+  document.getElementById('dash-user-email').textContent = user.email || user.phone || '';
+  document.getElementById('dash-welcome-txt').textContent = 'Willkommen, '+name.split(' ')[0]+' 👋';
+  document.getElementById('prof-name').value = name;
+  document.getElementById('prof-email').value = user.email || '';
+  loadDashStats();
+}
+
+function onUserLoggedOut(){
+  currentUser = null;
+  document.getElementById('auth-btn').style.display='';
+  document.getElementById('logout-btn').style.display='none';
+  document.getElementById('nav-dash').style.display='none';
+  document.getElementById('nav-admin').style.display='none';
+}
+
+async function logout(){
+  if(!demoMode && supabaseClient) await supabaseClient.auth.signOut();
+  onUserLoggedOut();
+  showPage('home');
+  toast('Abgemeldet','info');
+}
+
+// ── PAGES ─────────────────────────────────────────────
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pg = document.getElementById('page-'+name);
+  if(pg) pg.classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l=>{
+    l.classList.toggle('active', l.dataset.nav===name);
+  });
+  if(name==='dash') loadDashStats();
+  if(name==='admin') loadAdminData();
+  window.scrollTo(0,0);
+}
+
+function requireAuth(dest){
+  if(currentUser || demoMode){
+    if(demoMode && !currentUser){
+      currentUser = demoUser;
+      onUserLoggedIn(currentUser);
+    }
+    showPage(dest);
+  } else {
+    showPage('auth');
+    toast('Bitte erst anmelden','info');
+  }
+}
+
+// ── LED VIZ ───────────────────────────────────────────
+function setLedViz(cls){
+  const el=document.getElementById('led-viz');
+  el.className='led-strip-viz '+cls;
+}
+
+// ── CONFIGURATOR ──────────────────────────────────────
+let config = {temp:null,tempGrad:null,tempPrice:0,length:0,cable:0,qty:1,dimmer:'none',dimmerPrice:0,delivery:null,deliveryPrice:0,date:''};
+
+function selectTemp(el,k,grad,price){
+  document.querySelectorAll('#temp-grid .option-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  config.temp=k; config.tempGrad=grad; config.tempPrice=price;
+  calcPrice();
+}
+
+function selectDimmer(type, extra){
+  ['none','phase','dali'].forEach(d=>{
+    document.getElementById('d-'+d).classList.remove('selected');
+    document.getElementById('sw-'+d).classList.remove('on');
+  });
+  document.getElementById('d-'+type).classList.add('selected');
+  document.getElementById('sw-'+type).classList.add('on');
+  config.dimmer=type; config.dimmerPrice=extra;
+  document.getElementById('s-dimmer').textContent = type==='none'?'Nicht dimmbar': type==='phase'?'Dimmbar (Phase)':'DALI dimmbar';
+  calcPrice();
+}
+
+function selectDelivery(type, price){
+  ['standard','express'].forEach(d=>document.getElementById('del-'+d).classList.remove('selected'));
+  document.getElementById('del-'+type).classList.add('selected');
+  config.delivery=type; config.deliveryPrice=price;
+  document.getElementById('express-note').classList.toggle('hidden', type!=='express');
+  const deliveryNames={'standard':'📦 Standard (5–8 Tage)','express':'⚡ Express (1–2 Tage)'};
+  document.getElementById('s-delivery').textContent = deliveryNames[type];
+  document.getElementById('s-delivery').style.color='';
+  calcPrice();
+}
+
+function calcPrice(){
+  config.length = parseFloat(document.getElementById('band-len').value)||0;
+  config.cable  = parseFloat(document.getElementById('cable-len').value)||0;
+  config.qty    = parseInt(document.getElementById('qty').value)||1;
+  config.date   = document.getElementById('wish-date').value;
+
+  // LED bar viz
+  const bar = document.getElementById('led-bar-fill');
+  if(config.temp && config.length>0){
+    bar.style.width = Math.min(100,(config.length/10)*100)+'%';
+    bar.style.background = config.tempGrad || 'var(--gold)';
+  }
+
+  document.getElementById('s-temp').textContent = config.temp||'—';
+  document.getElementById('s-temp').style.color = config.temp?'':'var(--text3)';
+  document.getElementById('s-len').textContent = config.length?config.length.toFixed(1)+' m':'—';
+  document.getElementById('s-len').style.color = config.length?'':'var(--text3)';
+  document.getElementById('s-cable').textContent = config.cable?config.cable.toFixed(1)+' m Kabel':'—';
+  document.getElementById('s-cable').style.color = config.cable?'':'var(--text3)';
+  document.getElementById('s-qty').textContent = config.qty+' Stk.';
+  document.getElementById('s-date').textContent = config.date?formatDate(config.date):'—';
+  document.getElementById('s-date').style.color = config.date?'':'var(--text3)';
+
+  if(config.temp && config.length>0 && config.delivery){
+    const band = (config.tempPrice + config.dimmerPrice) * config.length * config.qty;
+    const cable = config.cable * 2.5 * config.qty;
+    const total = band + cable + config.deliveryPrice;
+    document.getElementById('total-price').textContent = 'CHF '+total.toFixed(2);
+    document.getElementById('total-vat').textContent = 'MwSt. (7.7%): CHF '+(total*0.077/1.077).toFixed(2);
+    document.getElementById('order-btn').disabled = false;
+    document.getElementById('missing-msg').style.display='none';
+  } else {
+    document.getElementById('total-price').textContent = 'CHF —';
+    document.getElementById('total-vat').textContent = '';
+    document.getElementById('order-btn').disabled = true;
+    document.getElementById('missing-msg').style.display='';
+  }
+}
+
+function addToCart(){
+  const band = (config.tempPrice + config.dimmerPrice) * config.length * config.qty;
+  const cable = config.cable * 2.5 * config.qty;
+  const total = band + cable + config.deliveryPrice;
+  const item = {
+    id: Date.now(),
+    name: 'LED-Band '+config.temp,
+    meta: config.length.toFixed(1)+'m · '+config.dimmer+(config.cable?' · '+config.cable+'m Kabel':'')+(config.delivery?' · '+(config.delivery==='express'?'⚡ Express':'📦 Standard'):''),
+    price: parseFloat(total.toFixed(2)),
+    config: {...config}
+  };
+  cart.push(item);
+  updateCart();
+  openCart();
+  toast('LED-Band '+config.temp+' hinzugefügt','success');
+  if(currentUser){
+    savedConfigs.push({...config, saved_at: new Date().toISOString()});
+  }
+}
+
+// ── CART ──────────────────────────────────────────────
+let cart = [];
+function openCart(){
+  document.getElementById('cart-overlay').classList.remove('hidden');
+  renderCart();
+}
+function closeCart(){
+  document.getElementById('cart-overlay').classList.add('hidden');
+}
+function closeCartOutside(e){
+  if(e.target===document.getElementById('cart-overlay')) closeCart();
+}
+function removeCartItem(id){
+  cart = cart.filter(x=>x.id!==id);
+  updateCart();
+  renderCart();
+}
+function updateCart(){
+  const count = cart.length;
+  const badge = document.getElementById('cart-badge');
+  badge.style.display = count?'':'none';
+  badge.textContent = count;
+  const total = cart.reduce((s,x)=>s+x.price,0);
+  document.getElementById('cart-sub').textContent = 'CHF '+total.toFixed(2);
+  document.getElementById('cart-tot').textContent = 'CHF '+total.toFixed(2);
+}
+function renderCart(){
+  const body = document.getElementById('cart-body');
+  if(!cart.length){
+    body.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--text2)"><div style="font-size:32px;margin-bottom:12px;opacity:0.4">🛒</div><div style="font-family:\'Syne\',sans-serif;font-size:15px;font-weight:700;margin-bottom:8px">Warenkorb ist leer</div><div style="font-size:13px">Konfiguriere ein LED-Band</div></div>';
+    return;
+  }
+  body.innerHTML = cart.map(item=>`
+    <div class="cart-item">
+      <div class="cart-item-icon">💡</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-meta">${item.meta}</div>
+        <button class="cart-item-remove" onclick="removeCartItem(${item.id})">Entfernen</button>
+      </div>
+      <div class="cart-item-price">CHF ${item.price.toFixed(2)}</div>
+    </div>
+  `).join('');
+}
+function goCheckout(){
+  closeCart();
+  const total = cart.reduce((s,x)=>s+x.price,0);
+  const vat = total*0.077/1.077;
+  document.getElementById('co-sub').textContent = 'CHF '+total.toFixed(2);
+  document.getElementById('co-vat').textContent = 'CHF '+vat.toFixed(2);
+  document.getElementById('co-total').textContent = 'CHF '+total.toFixed(2);
+  document.getElementById('co-items-list').innerHTML = cart.map(item=>`
+    <div style="display:flex;justify-content:space-between;font-size:13px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <span>💡 ${item.name}</span>
+      <span style="color:var(--gold);font-weight:600">CHF ${item.price.toFixed(2)}</span>
+    </div>
+  `).join('');
+  if(currentUser){
+    const em = currentUser.email||'';
+    document.getElementById('co-email').value = em;
+  }
+  showPage('checkout');
+}
+
+function selectPay(type){
+  ['card','twint','invoice'].forEach(t=>{
+    document.getElementById('pay-'+t).classList.toggle('selected',t===type);
+    const f = document.getElementById('pay-'+t+'-fields');
+    if(f) f.classList.toggle('hidden', t!==type);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// ── STRIPE ZAHLUNGEN ──────────────────────────────────
+// ══════════════════════════════════════════════════════
+let stripeInstance = null;
+let stripeElements = null;
+let stripeCardElement = null;
+let currentPayMethod = 'card';
+let twintTimer = null;
+
+function initStripe(){
+  const pk = document.getElementById('stripe-pk-inp').value.trim();
+  if(!pk){toast('Bitte Stripe Publishable Key eingeben','error');return;}
+  if(!window.Stripe){
+    // Load Stripe.js dynamically
+    const s = document.createElement('script');
+    s.src = 'https://js.stripe.com/v3/';
+    s.onload = ()=>{ connectStripe(pk); };
+    document.head.appendChild(s);
+  } else {
+    connectStripe(pk);
+  }
+}
+
+function connectStripe(pk){
+  try {
+    stripeInstance = Stripe(pk);
+    const statusEl = document.getElementById('stripe-status');
+    statusEl.style.background = 'rgba(45,216,122,0.1)';
+    statusEl.style.color = 'var(--green)';
+    statusEl.style.borderColor = 'rgba(45,216,122,0.2)';
+    statusEl.textContent = '● Stripe verbunden ✓';
+    toast('Stripe verbunden! Echte Zahlungen aktiviert.','success');
+    mountStripeCard();
+  } catch(e){
+    toast('Stripe Fehler: '+e.message,'error');
+  }
+}
+
+function mountStripeCard(){
+  if(!stripeInstance) return;
+  stripeElements = stripeInstance.elements({
+    appearance:{ theme:'night', variables:{ colorPrimary:'#e8b84b', colorBackground:'#1a1c24', colorText:'#eef0f6', colorDanger:'#e85555', fontFamily:'DM Sans,sans-serif', borderRadius:'6px' }}
+  });
+  stripeCardElement = stripeElements.create('card', {
+    style:{ base:{ color:'#eef0f6', fontFamily:'DM Sans,sans-serif', fontSize:'15px', '::placeholder':{ color:'#555a6e' }}, invalid:{ color:'#e85555' }}
+  });
+  document.getElementById('stripe-card-element').innerHTML = '';
+  stripeCardElement.mount('#stripe-card-element');
+  stripeCardElement.on('change', e=>{
+    document.getElementById('card-error').style.display = e.error ? '' : 'none';
+    document.getElementById('card-error').textContent = e.error ? e.error.message : '';
+    validateCheckout();
+  });
+  document.getElementById('stripe-card-element').style.display = '';
+  document.getElementById('demo-card-form').style.display = 'none';
+}
+
+function selectPay(type){
+  currentPayMethod = type;
+  ['card','twint','invoice'].forEach(t=>{
+    document.getElementById('pay-'+t).classList.toggle('selected', t===type);
+    const f = document.getElementById('pay-'+t+'-fields');
+    if(f) f.classList.toggle('hidden', t!==type);
+  });
+  const icons = {card:'💳',twint:'📱',invoice:'🧾'};
+  const txts = {card:'Jetzt mit Kreditkarte bezahlen','twint':'Mit TWINT bezahlen','invoice':'Bestellung aufgeben'};
+  document.getElementById('pay-btn-icon').textContent = icons[type]||'🔒';
+  document.getElementById('pay-btn-txt').textContent = txts[type]||'Jetzt bezahlen';
+  validateCheckout();
+}
+
+function validateCheckout(){
+  const fname = document.getElementById('co-fname')?.value.trim();
+  const lname = document.getElementById('co-lname')?.value.trim();
+  const email = document.getElementById('co-email')?.value.trim();
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email||'');
+  let payOk = true;
+  if(currentPayMethod==='card' && !stripeInstance){
+    const nr = document.getElementById('card-nr')?.value.replace(/\s/g,'');
+    const exp = document.getElementById('card-exp')?.value;
+    const cvv = document.getElementById('card-cvv')?.value;
+    payOk = nr?.length>=15 && exp?.length>=4 && cvv?.length>=3;
+  }
+  const ok = fname && lname && emailOk && payOk;
+  const btn = document.getElementById('pay-now-btn');
+  if(btn) btn.disabled = !ok;
+}
+
+function formatCardNr(inp){
+  let v = inp.value.replace(/\D/g,'').substring(0,16);
+  inp.value = v.replace(/(.{4})/g,'$1 ').trim();
+  // detect card brand
+  const icon = document.getElementById('card-brand-icon');
+  if(!icon) return;
+  if(/^4/.test(v)) icon.textContent='💳'; // Visa
+  else if(/^5[1-5]/.test(v)||/^2[2-7]/.test(v)) icon.textContent='💳'; // MC
+  else if(/^3[47]/.test(v)) icon.textContent='💳'; // Amex
+  else icon.textContent='💳';
+}
+
+function formatCardExp(inp){
+  let v = inp.value.replace(/\D/g,'').substring(0,4);
+  if(v.length>=2) v = v.substring(0,2)+' / '+v.substring(2);
+  inp.value = v;
+}
+
+async function processPayment(){
+  const fname = document.getElementById('co-fname').value.trim();
+  const lname = document.getElementById('co-lname').value.trim();
+  const email = document.getElementById('co-email').value.trim();
+  const total = parseFloat(document.getElementById('co-total').textContent.replace('CHF ',''))||0;
+
+  if(!fname||!lname||!email){toast('Bitte alle Pflichtfelder ausfüllen','error');return;}
+
+  document.getElementById('pay-now-btn').style.display='none';
+  document.getElementById('pay-processing').style.display='';
+
+  if(currentPayMethod==='card'){
+    await processCard(fname+' '+lname, email, total);
+  } else if(currentPayMethod==='twint'){
+    await processTwint(email, total);
+  } else {
+    await processInvoice(fname+' '+lname, email, total);
+  }
+}
+
+async function processCard(name, email, total){
+  document.getElementById('pay-processing-txt').textContent = 'Kreditkarte wird verarbeitet…';
+
+  if(stripeInstance && stripeCardElement){
+    // LIVE MODE via Stripe
+    try {
+      // In production: first call your backend to create PaymentIntent
+      // const resp = await fetch('/api/create-payment-intent', {method:'POST',body:JSON.stringify({amount:Math.round(total*100),currency:'chf',...}});
+      // const {clientSecret} = await resp.json();
+      // const result = await stripeInstance.confirmCardPayment(clientSecret, {payment_method:{card:stripeCardElement,billing_details:{name,email}}});
+      toast('Stripe live: Backend-Endpoint /api/create-payment-intent benötigt','info');
+      setTimeout(()=>finishPayment('card',name,email,total),1500);
+    } catch(e){
+      showPayError(e.message);
+    }
+  } else {
+    // DEMO MODE: simulate 3DS check
+    document.getElementById('pay-processing-txt').textContent = '3D Secure Authentifizierung…';
+    await sleep(800);
+    document.getElementById('pay-processing-txt').textContent = 'Zahlung wird bestätigt…';
+    await sleep(600);
+    finishPayment('card', name, email, total);
+  }
+}
+
+async function processTwint(email, total){
+  document.getElementById('pay-processing-txt').textContent = 'TWINT QR-Code wird generiert…';
+  await sleep(600);
+
+  if(stripeInstance){
+    // LIVE: stripe.confirmTwintPayment(clientSecret)
+    toast('Stripe TWINT live: Backend-Endpoint benötigt','info');
+  }
+
+  // Show QR code (demo)
+  document.getElementById('pay-processing').style.display='none';
+  document.getElementById('pay-now-btn').style.display='';
+  document.getElementById('pay-now-btn').disabled=true;
+  document.getElementById('pay-now-btn').textContent='Warte auf TWINT…';
+
+  const qrArea = document.getElementById('twint-qr-area');
+  qrArea.style.display='';
+  drawTwintQR();
+  startTwintTimer(email, total);
+}
+
+function drawTwintQR(){
+  const canvas = document.getElementById('twint-qr');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width=160; canvas.height=160;
+  // Simple QR-like demo pattern
+  ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,160,160);
+  ctx.fillStyle='#000000';
+  // Corner squares
+  [[8,8],[108,8],[8,108]].forEach(([x,y])=>{
+    ctx.fillRect(x,y,44,44); ctx.fillStyle='#ffffff'; ctx.fillRect(x+8,y+8,28,28); ctx.fillStyle='#000000'; ctx.fillRect(x+16,y+16,12,12);
+    ctx.fillStyle='#000000';
+  });
+  // Random data cells
+  for(let i=0;i<60;i++){
+    const x=8+Math.floor(Math.random()*18)*8; const y=8+Math.floor(Math.random()*18)*8;
+    ctx.fillRect(x,y,8,8);
+  }
+  // TWINT logo area
+  ctx.fillStyle='#ffffff'; ctx.fillRect(60,60,40,40);
+  ctx.fillStyle='#0068b4'; ctx.font='bold 10px Arial'; ctx.textAlign='center'; ctx.fillText('TWINT',80,85);
+}
+
+function startTwintTimer(email, total){
+  let secs = 300; // 5 min
+  if(twintTimer) clearInterval(twintTimer);
+  twintTimer = setInterval(()=>{
+    secs--;
+    const m = Math.floor(secs/60).toString().padStart(2,'0');
+    const s = (secs%60).toString().padStart(2,'0');
+    const el = document.getElementById('twint-timer');
+    if(el) el.textContent = 'Gültig für: '+m+':'+s;
+    if(secs<=0){
+      clearInterval(twintTimer);
+      if(el) el.textContent = 'QR-Code abgelaufen';
+    }
+    // Demo: auto-complete after 5 sec
+    if(secs===295){
+      clearInterval(twintTimer);
+      document.getElementById('twint-qr-area').style.display='none';
+      document.getElementById('pay-now-btn').style.display='none';
+      document.getElementById('pay-processing').style.display='';
+      document.getElementById('pay-processing-txt').textContent='TWINT Zahlung bestätigt…';
+      setTimeout(()=>finishPayment('twint','',email,total),1200);
+    }
+  },1000);
+}
+
+async function processInvoice(name, email, total){
+  document.getElementById('pay-processing-txt').textContent = 'Bestellung wird aufgegeben…';
+  await sleep(800);
+  finishPayment('invoice', name, email, total);
+}
+
+async function finishPayment(method, name, email, total){
+  // Save order to demo/Supabase
+  const orderNum = 'LS-'+new Date().getFullYear()+'-'+String(Math.floor(Math.random()*9000)+1000);
+  const methodNames={card:'Kreditkarte',twint:'TWINT',invoice:'Rechnung (30 Tage)'};
+
+  for(const item of cart){
+    await sbSaveOrder({
+      temp:item.config?.temp||'—',length_m:item.config?.length||0,cable_m:item.config?.cable||0,
+      dimmer:item.config?.dimmer||'none',delivery:item.config?.delivery||'standard',
+      total_chf:item.price,status:'confirmed',
+      customer_name:name,customer_email:email,payment_method:method
+    });
+    // Deduct from inventory (demo)
+    if(item.config?.temp){
+      const prodNr = 'LED-2835-'+item.config.temp;
+      const p = products.find(x=>x.nr===prodNr);
+      if(p) p.stock = Math.max(0, Math.round((p.stock-(item.config.length||0))*100)/100);
+    }
+  }
+
+  // Create invoice automatically
+  if(method!=='invoice'){
+    const autoInv = {
+      id:'RE-'+new Date().getFullYear()+'-'+String(bizSettings.nextNr).padStart(3,'0'),
+      customer:name||'Kunde',email,date:new Date().toISOString().split('T')[0],
+      due:addDays(new Date().toISOString().split('T')[0],method==='invoice'?30:0),
+      duedays:method==='invoice'?30:0,currency:'CHF',
+      items:cart.map(i=>({desc:i.name,qty:1,unit:'Pauschal',price:i.price/1.077,vat:7.7})),
+      notes:bizSettings.iban?'IBAN: '+bizSettings.iban:'',status:'paid'
+    };
+    invoices.unshift(autoInv);
+    bizSettings.nextNr++;
+  }
+
+  cart=[]; updateCart();
+  if(twintTimer){clearInterval(twintTimer);twintTimer=null;}
+
+  document.getElementById('pay-processing').style.display='none';
+  document.getElementById('pay-now-btn').style.display='';
+
+  document.getElementById('confirm-order-num').textContent=orderNum;
+  const methodIcon={card:'💳',twint:'📱',invoice:'🧾'};
+  document.getElementById('confirm-details').innerHTML =
+    `Bezahlt mit <strong>${methodNames[method]}</strong> ${methodIcon[method]}<br>Auftragsbestätigung an <strong>${email}</strong> gesendet.<br>Gesamtbetrag: <strong style="color:var(--gold)">CHF ${total.toFixed(2)}</strong><br><br>${method==='invoice'?'<span style="color:var(--gold)">Rechnung per E-Mail innert 24h · Zahlungsziel 30 Tage</span>':'Zahlung erfolgreich verarbeitet ✓'}`;
+  showPage('confirm');
+  toast('Zahlung erfolgreich! 🎉','success');
+}
+
+function showPayError(msg){
+  document.getElementById('pay-processing').style.display='none';
+  document.getElementById('pay-now-btn').style.display='';
+  const err = document.getElementById('card-error');
+  err.style.display='';
+  err.textContent='⚠ '+msg;
+  toast('Zahlung fehlgeschlagen: '+msg,'error');
+}
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+// Keep old placeOrder for compatibility
+async function placeOrder(){ await processPayment(); }
+
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+// ── AUTH ──────────────────────────────────────────────
+function switchAuthTab(type, btn){
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  const isReg = type==='reg';
+  document.getElementById('choice-heading').textContent = isReg?'Willkommen':'Willkommen zurück';
+  document.getElementById('choice-subheading').textContent = isReg?'Erstelle dein Konto oder melde dich an.':'Schön, dich wiederzusehen.';
+  document.getElementById('verify-badge').style.display = isReg?'':'none';
+  document.getElementById('email-heading').textContent = isReg?'Konto erstellen':'Anmelden';
+  document.getElementById('submit-email-btn').textContent = isReg?'Bestätigungsmail senden →':'Anmelden →';
+}
+
+function goAuthScreen(id){
+  document.querySelectorAll('.auth-screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function buildOTP(containerId){
+  const el = document.getElementById(containerId);
+  el.innerHTML='';
+  for(let i=0;i<6;i++){
+    const inp = document.createElement('input');
+    inp.type='text'; inp.maxLength=1; inp.className='otp-inp';
+    inp.setAttribute('inputmode','numeric');
+    inp.addEventListener('input',e=>{
+      if(e.target.value.length===1 && i<5) el.children[i+1].focus();
+    });
+    inp.addEventListener('keydown',e=>{
+      if(e.key==='Backspace'&&!e.target.value&&i>0) el.children[i-1].focus();
+    });
+    el.appendChild(inp);
+  }
+}
+
+function validateEmailForm(){
+  const name = document.getElementById('inp-name').value.trim();
+  const email = document.getElementById('inp-email').value.trim();
+  const pw = document.getElementById('inp-pw').value;
+  const terms = document.getElementById('chk-terms').checked;
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  document.getElementById('submit-email-btn').disabled = !(name&&emailOk&&pw.length>=8&&terms);
+}
+
+function checkStrength(){
+  const pw = document.getElementById('inp-pw').value;
+  let s=0;
+  if(pw.length>=8)s++;if(/[A-Z]/.test(pw))s++;if(/[0-9]/.test(pw))s++;if(/[^a-zA-Z0-9]/.test(pw))s++;
+  const colors=['var(--red)','#ff8c00','#ffd280','var(--green)'];
+  const labels=['Schwach','Ausreichend','Gut','Stark'];
+  for(let i=0;i<4;i++){
+    const b = document.getElementById('sb'+(i+1));
+    b.style.background = i<s ? colors[s-1] : 'var(--border)';
+  }
+  document.getElementById('str-label').textContent = pw.length ? labels[s-1]||'' : '';
+  document.getElementById('str-label').style.color = s>0?colors[s-1]:'';
+}
+
+function togglePw(id, btn){
+  const inp = document.getElementById(id);
+  inp.type = inp.type==='password'?'text':'password';
+  btn.textContent = inp.type==='password'?'👁':'🙈';
+}
+
+function validatePhone(){
+  const phone = document.getElementById('inp-phone').value.trim();
+  document.getElementById('send-sms-btn').disabled = phone.length < 8;
+}
+
+async function submitEmail(){
+  const name = document.getElementById('inp-name').value.trim();
+  const email = document.getElementById('inp-email').value.trim();
+  const pw = document.getElementById('inp-pw').value;
+  const isLogin = !document.getElementById('tab-reg').classList.contains('active');
+  document.getElementById('submit-email-btn').disabled = true;
+  document.getElementById('submit-email-btn').textContent = 'Wird gesendet…';
+  if(isLogin){
+    const {error} = await sbSignIn(email, pw);
+    if(error){toast('Fehler: '+error.message,'error');document.getElementById('submit-email-btn').disabled=false;document.getElementById('submit-email-btn').textContent='Anmelden →';return;}
+    goAuthScreen('asc-success');
+    toast('Erfolgreich angemeldet!','success');
+  } else {
+    const {error} = await sbSignUp(email, pw, name);
+    if(error){toast('Fehler: '+error.message,'error');document.getElementById('submit-email-btn').disabled=false;document.getElementById('submit-email-btn').textContent='Bestätigungsmail senden →';return;}
+    document.getElementById('verify-email-target').textContent = email;
+    buildOTP('otp-email');
+    goAuthScreen('asc-email-verify');
+    startCountdown('resend-email-btn','cd-email');
+    toast('Code wurde gesendet','success');
+  }
+}
+
+async function sendSMS(){
+  const cc = document.getElementById('cc-sel').value;
+  const phone = document.getElementById('inp-phone').value.trim();
+  const full = cc+phone.replace(/\s/g,'');
+  document.getElementById('send-sms-btn').disabled=true;
+  document.getElementById('send-sms-btn').textContent='Wird gesendet…';
+  const {error} = await sbSignInPhone(full);
+  if(error){toast('Fehler: '+error.message,'error');document.getElementById('send-sms-btn').disabled=false;document.getElementById('send-sms-btn').textContent='SMS-Code senden →';return;}
+  document.getElementById('verify-phone-target').textContent = full;
+  buildOTP('otp-phone');
+  goAuthScreen('asc-phone-verify');
+  startCountdown('resend-phone-btn','cd-phone');
+  toast('SMS-Code gesendet','success');
+}
+
+async function submitOTP(type){
+  const grid = document.getElementById('otp-'+type);
+  const code = Array.from(grid.querySelectorAll('.otp-inp')).map(i=>i.value).join('');
+  if(code.length<6){toast('Bitte alle 6 Stellen eingeben','error');return;}
+  if(type==='phone'){
+    const cc = document.getElementById('cc-sel').value;
+    const phone = document.getElementById('inp-phone').value.trim();
+    const full = cc+phone.replace(/\s/g,'');
+    if(!demoMode){
+      const {error} = await sbVerifyOTP(full, code);
+      if(error){toast('Falscher Code','error');return;}
+    }
+  }
+  if(demoMode && !currentUser){
+    currentUser = demoUser;
+    onUserLoggedIn(currentUser);
+  }
+  goAuthScreen('asc-success');
+  toast('Verifizierung erfolgreich!','success');
+}
+
+async function authApple(){
+  await sbSignInApple();
+  if(demoMode){
+    goAuthScreen('asc-success');
+    toast('Mit Apple ID angemeldet (Demo)','success');
+  }
+}
+
+function resendEmail(){startCountdown('resend-email-btn','cd-email');toast('Code erneut gesendet','info');}
+function resendSMS(){startCountdown('resend-phone-btn','cd-phone');toast('SMS erneut gesendet','info');}
+
+let cdTimer = null;
+function startCountdown(btnId, countId){
+  let s = 30;
+  const btn = document.getElementById(btnId);
+  const cnt = document.getElementById(countId);
+  btn.disabled=true;
+  if(cdTimer) clearInterval(cdTimer);
+  cdTimer = setInterval(()=>{
+    s--;
+    cnt.textContent = ' ('+s+'s)';
+    if(s<=0){clearInterval(cdTimer);btn.disabled=false;cnt.textContent='';}
+  },1000);
+}
+
+// ── DASHBOARD ─────────────────────────────────────────
+function showDashTab(name, btn){
+  document.querySelectorAll('.dash-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('dt-'+name).classList.add('active');
+  document.querySelectorAll('#page-dash .dash-nav-item').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  if(name==='orders') renderOrdersTable();
+  if(name==='configs') renderConfigs();
+}
+
+async function loadDashStats(){
+  const orders = await sbGetOrders();
+  const total = orders.reduce((s,o)=>s+parseFloat(o.total_chf||0),0);
+  document.getElementById('ds-orders').textContent = orders.length;
+  document.getElementById('ds-spent').textContent = 'CHF '+total.toFixed(0);
+  document.getElementById('ds-configs').textContent = savedConfigs.length;
+  renderRecentOrders(orders.slice(0,3));
+}
+
+function renderRecentOrders(orders){
+  const el = document.getElementById('dash-recent-orders');
+  if(!orders.length){
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><div class="empty-title">Noch keine Bestellungen</div><div class="empty-desc">Konfiguriere dein erstes LED-Band</div><button class="btn btn-primary" onclick="showPage('config')">Jetzt konfigurieren</button></div>`;
+    return;
+  }
+  el.innerHTML = `<table class="orders-table"><thead><tr><th>Bestellnr.</th><th>Produkt</th><th>Betrag</th><th>Status</th><th>Datum</th></tr></thead><tbody>${orders.map(o=>orderRow(o)).join('')}</tbody></table>`;
+}
+
+async function renderOrdersTable(){
+  const orders = await sbGetOrders();
+  const el = document.getElementById('dash-orders-list');
+  if(!orders.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">📦</div><div class="empty-title">Noch keine Bestellungen</div><button class="btn btn-primary" onclick="showPage('config')">Jetzt konfigurieren</button></div>`;return;}
+  el.innerHTML=`<table class="orders-table"><thead><tr><th>Bestellnr.</th><th>Produkt</th><th>Betrag</th><th>Status</th><th>Datum</th></tr></thead><tbody>${orders.map(o=>orderRow(o)).join('')}</tbody></table>`;
+}
+
+function orderRow(o){
+  const statusColors={pending:'gray',confirmed:'gold',in_production:'gold',shipped:'blue',delivered:'green'};
+  const sc = statusColors[o.status]||'gray';
+  const statusMap={pending:'Ausstehend',confirmed:'Bestätigt',in_production:'In Fertigung',shipped:'Versandt',delivered:'Geliefert'};
+  return `<tr>
+    <td style="font-family:'Syne',sans-serif;font-weight:700;color:var(--gold)">${o.id}</td>
+    <td>LED-Band ${o.temp} · ${o.length_m}m ${o.dimmer!=='none'?'· '+o.dimmer:''}</td>
+    <td style="font-weight:600">CHF ${parseFloat(o.total_chf).toFixed(2)}</td>
+    <td><span class="badge badge-${sc}">${statusMap[o.status]||o.status}</span></td>
+    <td style="color:var(--text2)">${new Date(o.created_at).toLocaleDateString('de-CH')}</td>
+  </tr>`;
+}
+
+function renderConfigs(){
+  const el = document.getElementById('dash-configs-list');
+  if(!savedConfigs.length){
+    el.innerHTML=`<div class="empty-state"><div class="empty-icon">💡</div><div class="empty-title">Keine gespeicherten Konfigurationen</div><div class="empty-desc">Konfiguriere ein LED-Band und es wird hier gespeichert</div><button class="btn btn-primary" onclick="showPage('config')">Konfigurieren</button></div>`;
+    return;
+  }
+  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">${savedConfigs.map((c,i)=>`
+    <div class="card" style="padding:20px">
+      <div style="height:8px;border-radius:4px;background:${c.tempGrad||'var(--gold)'};margin-bottom:12px"></div>
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:6px">LED-Band ${c.temp}</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.7">${c.length}m · ${c.dimmer} · ${c.delivery}<br>${c.cable?c.cable+'m Kabel':''}</div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:12px;width:100%" onclick="loadConfig(${i})">Wieder bestellen</button>
+    </div>`).join('')}</div>`;
+}
+
+function loadConfig(i){
+  const c = savedConfigs[i];
+  Object.assign(config, c);
+  showPage('config');
+  calcPrice();
+  toast('Konfiguration geladen','success');
+}
+
+function saveProfile(){
+  toast('Profil gespeichert','success');
+}
+
+// ── ADMIN ─────────────────────────────────────────────
+function showAdminTab(name, btn){
+  document.querySelectorAll('.dash-tab[id^="at-"]').forEach(t=>t.classList.remove('active'));
+  document.getElementById('at-'+name).classList.add('active');
+  document.querySelectorAll('#page-admin .dash-nav-item').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+async function loadAdminData(){
+  const orders = demoOrders;
+  const total = orders.reduce((s,o)=>s+parseFloat(o.total_chf||0),0);
+  document.getElementById('adm-total-orders').textContent = orders.length;
+  document.getElementById('adm-revenue').textContent = 'CHF '+total.toFixed(0);
+  document.getElementById('adm-customers').textContent = '1';
+  document.getElementById('adm-pending').textContent = orders.filter(o=>o.status==='pending').length;
+  renderAdminOrders(orders);
+  renderAdminCustomers();
+}
+
+function renderAdminOrders(orders){
+  const el = document.getElementById('admin-orders-list');
+  if(!orders.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">📦</div><div class="empty-title">Keine Bestellungen</div></div>';return;}
+  el.innerHTML=`<table class="orders-table" style="width:100%"><thead><tr><th>ID</th><th>Kunde</th><th>Produkt</th><th>Betrag</th><th>Status</th><th>Aktion</th></tr></thead><tbody>${orders.map(o=>`<tr>
+    <td style="font-family:'Syne',sans-serif;font-weight:700;color:var(--gold)">${o.id}</td>
+    <td style="color:var(--text2)">${o.customer_name||'Demo Nutzer'}</td>
+    <td>LED ${o.temp} ${o.length_m}m</td>
+    <td style="font-weight:600">CHF ${parseFloat(o.total_chf).toFixed(2)}</td>
+    <td><select class="status-select" onchange="sbUpdateOrderStatus('${o.id}',this.value);toast('Status aktualisiert','success')">
+      ${['pending','confirmed','in_production','shipped','delivered'].map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('')}
+    </select></td>
+    <td><button class="btn btn-ghost btn-sm" onclick="toast('Rechnung wird generiert…','info')">PDF</button></td>
+  </tr>`).join('')}</tbody></table>`;
+}
+
+let adminOrderFilter = '';
+function filterAdminOrders(val){
+  adminOrderFilter = val.toLowerCase();
+  const filtered = demoOrders.filter(o=> !adminOrderFilter || o.id.toLowerCase().includes(adminOrderFilter) || (o.customer_name||'').toLowerCase().includes(adminOrderFilter));
+  renderAdminOrders(filtered);
+}
+function filterAdminStatus(val){
+  const filtered = val ? demoOrders.filter(o=>o.status===val) : demoOrders;
+  renderAdminOrders(filtered);
+}
+
+function renderAdminCustomers(){
+  const el = document.getElementById('admin-customers-list');
+  el.innerHTML=`<table class="orders-table"><thead><tr><th>Name</th><th>E-Mail</th><th>Bestellungen</th><th>Umsatz</th></tr></thead><tbody>
+  <tr><td style="font-weight:500">Demo Nutzer</td><td style="color:var(--text2)">demo@ledstrip.ch</td><td>2</td><td style="color:var(--gold);font-weight:600">CHF 225.60</td></tr>
+  </tbody></table>`;
+}
+
+// ── LANG ──────────────────────────────────────────────
+const T = {
+  de:{btnApple:'Mit Apple ID fortfahren',btnEmail:'Mit E-Mail',btnPhone:'Mit Handynummer'},
+  en:{btnApple:'Continue with Apple ID',btnEmail:'With email',btnPhone:'With phone number'},
+  fr:{btnApple:'Continuer avec Apple ID',btnEmail:'Avec e-mail',btnPhone:'Avec numéro de tél.'}
+};
+function setLang(l){
+  const t=T[l]||T.de;
+  document.getElementById('btn-apple-txt').textContent=t.btnApple;
+  document.getElementById('btn-email-txt').textContent=t.btnEmail;
+  document.getElementById('btn-phone-txt').textContent=t.btnPhone;
+}
+
+// ══════════════════════════════════════════════════════
+// ── RECHNUNGEN ────────────────────────────────────────
+// ══════════════════════════════════════════════════════
+let invoices = [
+  {id:'RE-2026-001',customer:'Muster AG',email:'info@muster.ch',date:'2026-04-10',due:'2026-05-10',items:[{desc:'LED-Band 3000K 4.5m',qty:1,unit:'Pauschal',price:157.40,vat:7.7}],status:'paid',notes:''},
+  {id:'RE-2026-002',customer:'Hotel Bellevue',email:'info@bellevue.ch',date:'2026-05-02',due:'2026-06-02',items:[{desc:'LED-Band 2700K 12m COB + DALI',qty:1,unit:'Pauschal',price:580.00,vat:7.7},{desc:'Alu-Profile Einbau 12m',qty:1,unit:'Pauschal',price:102.00,vat:7.7}],status:'sent',notes:'Zahlung innert 30 Tagen. IBAN CH56 0483 5012 3456 7800 9'},
+  {id:'RE-2026-003',customer:'Privat M. Zimmermann',email:'',date:'2026-05-09',due:'2026-05-19',items:[{desc:'Installation Wohnzimmer',qty:3,unit:'Std.',price:95,vat:7.7}],status:'draft',notes:''},
+];
+let bizSettings = {name:'LEDStrip Pro GmbH',uid:'CHE-123.456.789 MWST',street:'Gewerbestrasse 1',city:'4000 Basel',phone:'+41 61 123 45 67',email:'info@ledstrip-pro.ch',iban:'CH56 0483 5012 3456 7800 9',bank:'UBS AG, 4001 Basel',nextNr:4};
+let invItems = [];
+let editingInvId = null;
+
+function showInvTab(name, btn){
+  document.querySelectorAll('#page-invoices .dash-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('invt-'+name).classList.add('active');
+  document.querySelectorAll('#page-invoices .dash-nav-item').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  if(name==='list') renderInvoiceList();
+  if(name==='new') initNewInvoice();
+  if(name==='settings') loadBizSettings();
+}
+
+function renderInvoiceList(filter='', statusFilter=''){
+  let list = invoices.filter(inv=>{
+    const matchText = !filter || inv.customer.toLowerCase().includes(filter.toLowerCase()) || inv.id.toLowerCase().includes(filter.toLowerCase());
+    const matchStatus = !statusFilter || inv.status===statusFilter;
+    return matchText && matchStatus;
+  });
+  const open = invoices.filter(i=>i.status==='sent').reduce((s,i)=>s+invTotal(i),0);
+  const paid = invoices.filter(i=>i.status==='paid').reduce((s,i)=>s+invTotal(i),0);
+  const overdue = invoices.filter(i=>i.status==='overdue').length;
+  document.getElementById('inv-stat-open').textContent = 'CHF '+open.toFixed(2);
+  document.getElementById('inv-stat-paid').textContent = 'CHF '+paid.toFixed(2);
+  document.getElementById('inv-stat-overdue').textContent = overdue;
+  document.getElementById('inv-stat-total').textContent = invoices.length;
+  const statusLabels={draft:'Entwurf',sent:'Gesendet',paid:'Bezahlt',overdue:'Überfällig'};
+  const statusColors={draft:'badge-gray',sent:'badge-gold',paid:'badge-green',overdue:'badge-red'};
+  const tbody = document.getElementById('invoices-tbody');
+  if(!list.length){tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text3)">Keine Rechnungen gefunden</td></tr>`;return;}
+  tbody.innerHTML = list.map(inv=>`
+    <tr>
+      <td style="font-family:'Syne',sans-serif;font-weight:700;color:var(--gold)">${inv.id}</td>
+      <td><div style="font-weight:500">${inv.customer}</div><div style="font-size:12px;color:var(--text3)">${inv.email||'—'}</div></td>
+      <td style="color:var(--text2)">${inv.date}</td>
+      <td style="color:var(--text2)">${inv.due}</td>
+      <td style="font-weight:600">CHF ${invTotal(inv).toFixed(2)}</td>
+      <td><span class="badge ${statusColors[inv.status]||'badge-gray'}">${statusLabels[inv.status]||inv.status}</span></td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost btn-sm" onclick="editInvoice('${inv.id}')">✏</button>
+          <button class="btn btn-ghost btn-sm" onclick="viewInvoicePdf('${inv.id}')">👁</button>
+          <button class="btn btn-ghost btn-sm" onclick="markPaid('${inv.id}')">✓ Bezahlt</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function invTotal(inv){
+  return inv.items.reduce((s,item)=>s + item.qty*item.price*(1+item.vat/100),0);
+}
+function invSubtotal(inv){
+  return inv.items.reduce((s,item)=>s + item.qty*item.price,0);
+}
+function invVat(inv){
+  return inv.items.reduce((s,item)=>s + item.qty*item.price*(item.vat/100),0);
+}
+
+function filterInvoices(v){ renderInvoiceList(v, document.querySelector('#invt-list select')?.value||''); }
+function filterInvoiceStatus(v){ renderInvoiceList(document.querySelector('#invt-list input')?.value||'', v); }
+
+function initNewInvoice(){
+  editingInvId = null;
+  const today = new Date();
+  document.getElementById('inv-date').value = today.toISOString().split('T')[0];
+  const due = new Date(today); due.setDate(due.getDate()+30);
+  document.getElementById('inv-nr').value = 'RE-'+today.getFullYear()+'-'+String(bizSettings.nextNr).padStart(3,'0');
+  invItems = [{desc:'',qty:1,unit:'m',price:0,vat:7.7}];
+  renderInvItems();
+}
+
+function renderInvItems(){
+  const tbody = document.getElementById('inv-items-tbody');
+  tbody.innerHTML = invItems.map((item,i)=>`
+    <tr>
+      <td><input type="text" value="${item.desc}" placeholder="z.B. LED-Band 3000K 5m + Profil" oninput="invItems[${i}].desc=this.value;calcInvTotal()"></td>
+      <td><input type="number" value="${item.qty}" min="0" step="0.1" oninput="invItems[${i}].qty=parseFloat(this.value)||0;calcInvTotal()" style="width:70px"></td>
+      <td><input type="text" value="${item.unit}" placeholder="m / Stk." oninput="invItems[${i}].unit=this.value" style="width:60px"></td>
+      <td><input type="number" value="${item.price}" min="0" step="0.01" oninput="invItems[${i}].price=parseFloat(this.value)||0;calcInvTotal()" style="width:100px"></td>
+      <td><input type="number" value="${item.vat}" min="0" max="100" step="0.1" oninput="invItems[${i}].vat=parseFloat(this.value)||0;calcInvTotal()" style="width:60px"></td>
+      <td style="font-weight:600;color:var(--gold)">CHF ${(item.qty*item.price*(1+item.vat/100)).toFixed(2)}</td>
+      <td><button onclick="invItems.splice(${i},1);renderInvItems();calcInvTotal()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px">✕</button></td>
+    </tr>`).join('');
+  calcInvTotal();
+}
+
+function addInvItem(){ invItems.push({desc:'',qty:1,unit:'m',price:0,vat:7.7}); renderInvItems(); }
+
+function calcInvTotal(){
+  const sub = invItems.reduce((s,i)=>s+i.qty*i.price,0);
+  const vat = invItems.reduce((s,i)=>s+i.qty*i.price*(i.vat/100),0);
+  const total = sub+vat;
+  document.getElementById('inv-subtotal').textContent = 'CHF '+sub.toFixed(2);
+  document.getElementById('inv-vat-total').textContent = 'CHF '+vat.toFixed(2);
+  document.getElementById('inv-grand-total').textContent = 'CHF '+total.toFixed(2);
+}
+
+function saveInvoice(status){
+  const nr = document.getElementById('inv-nr').value.trim();
+  const cname = document.getElementById('inv-cname').value.trim();
+  if(!nr||!cname){toast('Bitte Rechnungsnr. und Kundename angeben','error');return;}
+  if(!invItems.length||!invItems[0].desc){toast('Bitte mindestens eine Position erfassen','error');return;}
+  const inv = {
+    id: nr, customer: cname,
+    email: document.getElementById('inv-cemail').value.trim(),
+    contact: document.getElementById('inv-ccontact').value.trim(),
+    phone: document.getElementById('inv-cphone').value.trim(),
+    street: document.getElementById('inv-cstreet').value.trim(),
+    plz: document.getElementById('inv-cplz').value.trim(),
+    city: document.getElementById('inv-ccity').value.trim(),
+    date: document.getElementById('inv-date').value,
+    duedays: document.getElementById('inv-due').value,
+    due: addDays(document.getElementById('inv-date').value, parseInt(document.getElementById('inv-due').value)),
+    currency: document.getElementById('inv-currency').value,
+    items: JSON.parse(JSON.stringify(invItems)),
+    notes: document.getElementById('inv-notes').value,
+    status
+  };
+  if(editingInvId){
+    const idx = invoices.findIndex(i=>i.id===editingInvId);
+    if(idx>-1) invoices[idx]=inv;
+  } else {
+    invoices.unshift(inv);
+    bizSettings.nextNr++;
+  }
+  toast(status==='sent'?'Rechnung gespeichert & gesendet ✓':'Entwurf gespeichert','success');
+  showInvTab('list', document.getElementById('inv-nav-list'));
+}
+
+function editInvoice(id){
+  const inv = invoices.find(i=>i.id===id);
+  if(!inv) return;
+  editingInvId = id;
+  document.getElementById('inv-nr').value = inv.id;
+  document.getElementById('inv-date').value = inv.date;
+  document.getElementById('inv-cname').value = inv.customer;
+  document.getElementById('inv-cemail').value = inv.email||'';
+  document.getElementById('inv-ccontact').value = inv.contact||'';
+  document.getElementById('inv-cstreet').value = inv.street||'';
+  document.getElementById('inv-cplz').value = inv.plz||'';
+  document.getElementById('inv-ccity').value = inv.city||'';
+  document.getElementById('inv-notes').value = inv.notes||'';
+  invItems = JSON.parse(JSON.stringify(inv.items));
+  renderInvItems();
+  showInvTab('new', document.getElementById('inv-nav-new'));
+}
+
+function markPaid(id){
+  const inv = invoices.find(i=>i.id===id);
+  if(inv){inv.status='paid';toast('Als bezahlt markiert ✓','success');renderInvoiceList();}
+}
+
+function previewInvoice(){ viewInvoicePdfFromForm(); }
+
+function viewInvoicePdf(id){
+  const inv = invoices.find(i=>i.id===id);
+  if(!inv) return;
+  renderPdfPreview(inv);
+  showInvTab('preview', null);
+}
+
+function viewInvoicePdfFromForm(){
+  const inv = {
+    id: document.getElementById('inv-nr').value||'RE-???',
+    customer: document.getElementById('inv-cname').value||'—',
+    contact: document.getElementById('inv-ccontact').value,
+    street: document.getElementById('inv-cstreet').value,
+    plz: document.getElementById('inv-cplz').value,
+    city: document.getElementById('inv-ccity').value,
+    email: document.getElementById('inv-cemail').value,
+    date: document.getElementById('inv-date').value,
+    due: addDays(document.getElementById('inv-date').value||new Date().toISOString().split('T')[0], parseInt(document.getElementById('inv-due').value)||30),
+    currency: document.getElementById('inv-currency').value||'CHF',
+    items: JSON.parse(JSON.stringify(invItems)),
+    notes: document.getElementById('inv-notes').value
+  };
+  renderPdfPreview(inv);
+  showInvTab('preview', null);
+}
+
+function renderPdfPreview(inv){
+  const biz = bizSettings;
+  const sub = invSubtotal(inv).toFixed(2);
+  const vat = invVat(inv).toFixed(2);
+  const total = invTotal(inv).toFixed(2);
+  const cur = inv.currency||'CHF';
+  document.getElementById('pdf-preview-content').innerHTML = `
+  <div class="pdf-preview" id="pdf-printable">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px">
+      <div>
+        <h1>${biz.name}</h1>
+        <div style="color:#555;font-size:13px;margin-top:6px">${biz.street}<br>${biz.city}<br>${biz.phone} · ${biz.email}<br>${biz.uid}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:28px;font-weight:800;color:#1a1a1a;margin-bottom:8px">RECHNUNG</div>
+        <div style="font-size:15px;font-weight:700;color:#b8860b">${inv.id}</div>
+        <div style="font-size:12px;color:#777;margin-top:4px">Datum: ${inv.date||'—'}<br>Fällig: ${inv.due||'—'}</div>
+      </div>
+    </div>
+    <div class="pdf-meta">
+      <div><div style="font-size:11px;color:#999;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Rechnungsempfänger</div>
+        <strong>${inv.customer}</strong><br>
+        ${inv.contact?inv.contact+'<br>':''}
+        ${inv.street?inv.street+'<br>':''}
+        ${(inv.plz||inv.city)?((inv.plz||'')+' '+(inv.city||''))+'<br>':''}
+        ${inv.email||''}
+      </div>
+      <div><div style="font-size:11px;color:#999;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Details</div>
+        Zahlungsziel: ${inv.due||'—'}<br>
+        Währung: ${cur}
+      </div>
+    </div>
+    <table class="pdf-table">
+      <thead><tr><th>Beschreibung</th><th style="text-align:center">Menge</th><th style="text-align:center">Einheit</th><th style="text-align:right">Preis</th><th style="text-align:center">MwSt.</th><th style="text-align:right">Total</th></tr></thead>
+      <tbody>${inv.items.map(item=>`<tr>
+        <td>${item.desc}</td>
+        <td style="text-align:center">${item.qty}</td>
+        <td style="text-align:center">${item.unit||'—'}</td>
+        <td style="text-align:right">${cur} ${parseFloat(item.price).toFixed(2)}</td>
+        <td style="text-align:center">${item.vat}%</td>
+        <td style="text-align:right;font-weight:600">${cur} ${(item.qty*item.price*(1+item.vat/100)).toFixed(2)}</td>
+      </tr>`).join('')}</tbody>
+    </table>
+    <div class="pdf-total">
+      <div style="font-size:13px;color:#555;margin-bottom:4px">Zwischensumme: <strong style="color:#1a1a1a">${cur} ${sub}</strong></div>
+      <div style="font-size:13px;color:#555;margin-bottom:8px">MwSt. (7.7%): <strong style="color:#1a1a1a">${cur} ${vat}</strong></div>
+      <div style="font-size:22px;font-weight:800;color:#1a1a1a">Total ${cur} ${total}</div>
+    </div>
+    ${inv.notes?`<div style="margin-top:24px;padding:16px;background:#f8f8f8;border-radius:6px;font-size:12px;color:#555;line-height:1.7">${inv.notes.replace(/\n/g,'<br>')}</div>`:''}
+    <div style="margin-top:24px;display:flex;justify-content:space-between;align-items:flex-end">
+      <div style="font-size:11px;color:#999">Bankverbindung: ${biz.iban} · ${biz.bank}<br>Zahlungszweck: ${inv.id}</div>
+      <div class="qr-placeholder">QR-Code<br>Zahlung</div>
+    </div>
+    <div style="margin-top:24px;border-top:1px solid #eee;padding-top:12px;font-size:11px;color:#bbb;text-align:center">
+      ${biz.name} · ${biz.street} · ${biz.city} · ${biz.uid}
+    </div>
+  </div>`;
+}
+
+function printInvoice(){
+  const content = document.getElementById('pdf-printable');
+  if(!content){toast('Keine Vorschau vorhanden','error');return;}
+  const w = window.open('','_blank');
+  w.document.write('<html><head><title>Rechnung</title><style>body{font-family:Helvetica,Arial,sans-serif;padding:20px}table{width:100%;border-collapse:collapse}th{background:#1a1a1a;color:#fff;padding:8px 12px;text-align:left;font-size:12px}td{padding:8px 12px;border-bottom:1px solid #eee;font-size:13px}.pdf-total{text-align:right;padding:16px;background:#f8f8f8}.qr-placeholder{width:80px;height:80px;background:#f0f0f0;border:1px solid #ddd;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#999}</style></head><body>');
+  w.document.write(content.outerHTML);
+  w.document.write('</body></html>');
+  w.document.close();
+  w.print();
+}
+
+function loadBizSettings(){
+  document.getElementById('biz-name').value = bizSettings.name;
+  document.getElementById('biz-uid').value = bizSettings.uid||'';
+  document.getElementById('biz-street').value = bizSettings.street||'';
+  document.getElementById('biz-city').value = bizSettings.city||'';
+  document.getElementById('biz-phone').value = bizSettings.phone||'';
+  document.getElementById('biz-email').value = bizSettings.email||'';
+  document.getElementById('biz-iban').value = bizSettings.iban||'';
+  document.getElementById('biz-bank').value = bizSettings.bank||'';
+  document.getElementById('inv-next-nr').value = bizSettings.nextNr||1;
+  updateNextNrPreview();
+}
+function updateNextNrPreview(){
+  const n = parseInt(document.getElementById('inv-next-nr').value)||1;
+  document.getElementById('next-nr-preview').textContent = 'RE-'+new Date().getFullYear()+'-'+String(n).padStart(3,'0');
+}
+function saveBizSettings(){
+  bizSettings.name = document.getElementById('biz-name').value;
+  bizSettings.uid = document.getElementById('biz-uid').value;
+  bizSettings.street = document.getElementById('biz-street').value;
+  bizSettings.city = document.getElementById('biz-city').value;
+  bizSettings.phone = document.getElementById('biz-phone').value;
+  bizSettings.email = document.getElementById('biz-email').value;
+  bizSettings.iban = document.getElementById('biz-iban').value;
+  bizSettings.bank = document.getElementById('biz-bank').value;
+  bizSettings.nextNr = parseInt(document.getElementById('inv-next-nr').value)||1;
+  toast('Einstellungen gespeichert ✓','success');
+}
+function addDays(dateStr, days){
+  if(!dateStr) return '—';
+  const d = new Date(dateStr); d.setDate(d.getDate()+days);
+  return d.toISOString().split('T')[0];
+}
+
+// ══════════════════════════════════════════════════════
+// ── LAGERVERWALTUNG ───────────────────────────────────
+// ══════════════════════════════════════════════════════
+let products = [
+  {nr:'LED-2835-2700K',name:'LED-Band SMD2835 2700K 120LED/m DC24V',cat:'led',unit:'m',stock:150,minStock:30,buyPrice:0.95,sellPrice:12.50,supplier:'LEDYi'},
+  {nr:'LED-2835-3000K',name:'LED-Band SMD2835 3000K 120LED/m DC24V',cat:'led',unit:'m',stock:120,minStock:30,buyPrice:0.95,sellPrice:13.50,supplier:'LEDYi'},
+  {nr:'LED-2835-4000K',name:'LED-Band SMD2835 4000K 120LED/m DC24V',cat:'led',unit:'m',stock:80,minStock:30,buyPrice:0.95,sellPrice:14.50,supplier:'LEDYi'},
+  {nr:'LED-COB-3000K',name:'COB LED-Band 3000K 512LED/m DC24V',cat:'led',unit:'m',stock:40,minStock:10,buyPrice:3.50,sellPrice:22.00,supplier:'Lightstec'},
+  {nr:'PROFIL-FLACH',name:'Alu-Profil flach 20x7mm inkl. Diffusor',cat:'profil',unit:'m',stock:200,minStock:50,buyPrice:1.10,sellPrice:4.50,supplier:'Lightstec'},
+  {nr:'PROFIL-45',name:'Alu-Profil Eck 45° inkl. Diffusor',cat:'profil',unit:'m',stock:100,minStock:20,buyPrice:1.80,sellPrice:6.00,supplier:'Lightstec'},
+  {nr:'PROFIL-EINBAU',name:'Alu-Profil Einbau 12x7mm inkl. Diffusor',cat:'profil',unit:'m',stock:60,minStock:15,buyPrice:2.20,sellPrice:8.50,supplier:'Lightstec'},
+  {nr:'NT-HLG60-24B',name:'Netzteil Meanwell HLG-60H-24B 60W dimmbar',cat:'netzteil',unit:'Stk.',stock:20,minStock:5,buyPrice:32.00,sellPrice:65.00,supplier:'Meanwell'},
+  {nr:'NT-HLG100-24B',name:'Netzteil Meanwell HLG-100H-24B 100W dimmbar',cat:'netzteil',unit:'Stk.',stock:12,minStock:3,buyPrice:48.00,sellPrice:95.00,supplier:'Meanwell'},
+  {nr:'KABEL-2ADR',name:'Zuleitungskabel 2-adrig 0.75mm² schwarz',cat:'zubehoer',unit:'m',stock:300,minStock:50,buyPrice:0.35,sellPrice:2.50,supplier:'LEDYi'},
+  {nr:'DIMMER-TRIAC',name:'Dimmer TRIAC Phasenanschnitt 230V',cat:'dimmer',unit:'Stk.',stock:15,minStock:5,buyPrice:18.00,sellPrice:45.00,supplier:'LEDYi'},
+  {nr:'KONNEKTOR-2P',name:'LED-Verbinder 2-polig Schnellverbinder',cat:'zubehoer',unit:'Stk.',stock:8,minStock:20,buyPrice:0.15,sellPrice:1.50,supplier:'LEDYi'},
+];
+let movements = [
+  {date:'2026-04-10',product:'LED-2835-3000K',type:'in',qty:200,price:0.95,supplier:'LEDYi',ref:'',note:'Erstlieferung'},
+  {date:'2026-04-15',product:'LED-2835-3000K',type:'out',qty:4.5,price:0.95,reason:'order',ref:'LS-2026-0001',note:''},
+  {date:'2026-05-01',product:'PROFIL-FLACH',type:'in',qty:300,price:1.10,supplier:'Lightstec',ref:'',note:''},
+  {date:'2026-05-08',product:'LED-2835-2700K',type:'out',qty:2.0,price:0.95,reason:'order',ref:'LS-2026-0002',note:''},
+  {date:'2026-05-09',product:'KONNEKTOR-2P',type:'out',qty:12,price:0.15,reason:'order',ref:'LS-2026-0003',note:'Nachbestellung nötig'},
+];
+let editingProductNr = null;
+
+function showLagerTab(name, btn){
+  document.querySelectorAll('#page-inventory .dash-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('lagert-'+name).classList.add('active');
+  document.querySelectorAll('#page-inventory .dash-nav-item').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  if(name==='stock') renderStock();
+  if(name==='in'||name==='out') populateProductSelects();
+  if(name==='history') renderMovements();
+  if(name==='products') renderProductsManage();
+  // set today dates
+  const td = new Date().toISOString().split('T')[0];
+  const inD = document.getElementById('in-date'); if(inD) inD.value=td;
+  const outD = document.getElementById('out-date'); if(outD) outD.value=td;
+}
+
+function renderStock(filter='', catFilter=''){
+  const list = products.filter(p=>{
+    const mt = !filter || p.name.toLowerCase().includes(filter.toLowerCase()) || p.nr.toLowerCase().includes(filter.toLowerCase());
+    const mc = !catFilter || p.cat===catFilter;
+    return mt && mc;
+  });
+  const totalVal = products.reduce((s,p)=>s+p.stock*p.buyPrice,0);
+  const lowStock = products.filter(p=>p.stock<=p.minStock).length;
+  const totalItems = products.length;
+  const totalStockUnits = products.reduce((s,p)=>s+p.stock,0);
+  document.getElementById('lager-stats').innerHTML = `
+    <div class="stock-card"><div class="stock-card-label">Artikel total</div><div class="stock-card-val">${totalItems}</div></div>
+    <div class="stock-card"><div class="stock-card-label">Lagerwert</div><div class="stock-card-val" style="color:var(--gold)">CHF ${totalVal.toFixed(0)}</div></div>
+    <div class="stock-card"><div class="stock-card-label">Niedrig / Alarm</div><div class="stock-card-val" style="color:${lowStock>0?'var(--red)':'var(--green)'}">${lowStock}</div><div class="stock-card-sub">unter Mindestbestand</div></div>
+    <div class="stock-card"><div class="stock-card-label">Einträge</div><div class="stock-card-val">${movements.length}</div><div class="stock-card-sub">Lagerbewegungen</div></div>`;
+  const alerts = products.filter(p=>p.stock<=p.minStock);
+  document.getElementById('lager-alerts').innerHTML = alerts.length ? alerts.map(p=>`
+    <div class="stock-alert">⚠ <strong>${p.name}</strong> — Bestand: ${p.stock} ${p.unit} (Min: ${p.minStock} ${p.unit}) · Nachbestellung bei ${p.supplier} empfohlen</div>`).join('') : '';
+  const catNames={led:'LED-Band',profil:'Alu-Profil',netzteil:'Netzteil',dimmer:'Dimmer',zubehoer:'Zubehör'};
+  const tbody = document.getElementById('stock-tbody');
+  tbody.innerHTML = list.map(p=>{
+    const pct = Math.min(100, Math.round((p.stock/Math.max(p.minStock*3,p.stock))*100));
+    const barColor = p.stock<=p.minStock ? 'var(--red)' : p.stock<=p.minStock*1.5 ? 'var(--gold)' : 'var(--green)';
+    return `<tr>
+      <td><div style="font-weight:500;font-size:13px">${p.name}</div><div style="font-size:11px;color:var(--text3)">${p.nr}</div></td>
+      <td><span class="badge badge-gray">${catNames[p.cat]||p.cat}</span></td>
+      <td><span style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:${p.stock<=p.minStock?'var(--red)':p.stock<=p.minStock*1.5?'var(--gold)':'var(--text)'}">${p.stock}</span> <span style="color:var(--text3);font-size:12px">${p.unit}</span></td>
+      <td style="color:var(--text2)">${p.minStock} ${p.unit}</td>
+      <td><span class="stock-bar"><span class="stock-bar-fill" style="width:${pct}%;background:${barColor}"></span></span></td>
+      <td style="color:var(--text2)">CHF ${p.buyPrice.toFixed(2)}</td>
+      <td style="font-weight:600;color:var(--gold)">CHF ${(p.stock*p.buyPrice).toFixed(2)}</td>
+      <td><div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" onclick="quickBook('in','${p.nr}')">+</button>
+        <button class="btn btn-ghost btn-sm" onclick="quickBook('out','${p.nr}')">−</button>
+      </div></td>
+    </tr>`;}).join('');
+}
+
+function filterStock(v){ renderStock(v, document.querySelector('#lagert-stock select')?.value||''); }
+function filterStockCat(v){ renderStock(document.querySelector('#lagert-stock input')?.value||'', v); }
+
+function populateProductSelects(){
+  ['in-product','out-product'].forEach(id=>{
+    const sel = document.getElementById(id);
+    if(!sel) return;
+    sel.innerHTML='<option value="">Artikel wählen…</option>'+products.map(p=>`<option value="${p.nr}">${p.name} (${p.stock} ${p.unit})</option>`).join('');
+  });
+}
+
+function updateInPreview(){
+  const pnr = document.getElementById('in-product').value;
+  const qty = parseFloat(document.getElementById('in-qty').value)||0;
+  const price = parseFloat(document.getElementById('in-price').value)||0;
+  const p = products.find(x=>x.nr===pnr);
+  const preview = document.getElementById('in-preview');
+  if(p && qty>0){
+    document.getElementById('in-unit').textContent = p.unit;
+    const newStock = p.stock + qty;
+    const val = qty*price;
+    document.getElementById('in-preview-text').textContent = `+${qty} ${p.unit} → Neuer Bestand: ${newStock} ${p.unit} · Warenwert: CHF ${val.toFixed(2)}`;
+    preview.style.display='';
+  } else {
+    preview.style.display='none';
+  }
+}
+
+function bookIn(){
+  const pnr = document.getElementById('in-product').value;
+  const qty = parseFloat(document.getElementById('in-qty').value)||0;
+  const price = parseFloat(document.getElementById('in-price').value)||0;
+  const supplier = document.getElementById('in-supplier').value;
+  const date = document.getElementById('in-date').value;
+  const note = document.getElementById('in-note').value;
+  if(!pnr||!qty){toast('Bitte Artikel und Menge angeben','error');return;}
+  const p = products.find(x=>x.nr===pnr);
+  if(!p){return;}
+  p.stock = Math.round((p.stock + qty)*100)/100;
+  if(price>0) p.buyPrice = price;
+  movements.unshift({date,product:pnr,type:'in',qty,price,supplier,ref:'',note});
+  toast(`✅ +${qty} ${p.unit} ${p.name} eingebucht. Neuer Bestand: ${p.stock} ${p.unit}`,'success');
+  document.getElementById('in-product').value='';
+  document.getElementById('in-qty').value='';
+  document.getElementById('in-price').value='';
+  document.getElementById('in-preview').style.display='none';
+}
+
+function bookOut(){
+  const pnr = document.getElementById('out-product').value;
+  const qty = parseFloat(document.getElementById('out-qty').value)||0;
+  const reason = document.getElementById('out-reason').value;
+  const ref = document.getElementById('out-ref').value;
+  const date = document.getElementById('out-date').value;
+  const note = document.getElementById('out-note').value;
+  if(!pnr||!qty){toast('Bitte Artikel und Menge angeben','error');return;}
+  const p = products.find(x=>x.nr===pnr);
+  if(!p){return;}
+  if(qty > p.stock){toast(`Nicht genug Bestand! Verfügbar: ${p.stock} ${p.unit}`,'error');return;}
+  p.stock = Math.round((p.stock - qty)*100)/100;
+  movements.unshift({date,product:pnr,type:'out',qty,price:p.buyPrice,reason,ref,note});
+  toast(`📤 −${qty} ${p.unit} ${p.name} ausgebucht. Neuer Bestand: ${p.stock} ${p.unit}`,'success');
+  document.getElementById('out-qty').value='';
+  document.getElementById('out-ref').value='';
+  if(p.stock<=p.minStock) toast(`⚠ Mindestbestand erreicht für ${p.name}!`,'error');
+}
+
+function quickBook(type, pnr){
+  showLagerTab(type, document.getElementById('lager-nav-'+type));
+  setTimeout(()=>{
+    const sel = document.getElementById(type+'-product');
+    if(sel){sel.value=pnr; if(type==='in') updateInPreview();}
+  },50);
+}
+
+function renderMovements(filter='', typeFilter=''){
+  const list = movements.filter(m=>{
+    const p = products.find(x=>x.nr===m.product);
+    const name = p?p.name:m.product;
+    const mt = !filter || name.toLowerCase().includes(filter.toLowerCase()) || (m.ref||'').toLowerCase().includes(filter.toLowerCase());
+    const mtype = !typeFilter || m.type===typeFilter;
+    return mt && mtype;
+  });
+  const typeLabels={in:'<span class="movement-tag mv-in">Eingang</span>',out:'<span class="movement-tag mv-out">Ausgang</span>',adj:'<span class="movement-tag mv-adj">Korrektur</span>'};
+  const reasonLabels={order:'Bestellung',install:'Installation',sample:'Muster',loss:'Verlust',correction:'Korrektur'};
+  const tbody = document.getElementById('movements-tbody');
+  if(!list.length){tbody.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text3)">Keine Bewegungen</td></tr>`;return;}
+  tbody.innerHTML = list.map(m=>{
+    const p = products.find(x=>x.nr===m.product);
+    const name = p?p.name:m.product;
+    const unit = p?p.unit:'';
+    const val = (m.qty*(m.price||0));
+    const sign = m.type==='in'?'+':'−';
+    return `<tr>
+      <td style="color:var(--text2);font-size:12px">${m.date}</td>
+      <td><div style="font-size:13px;font-weight:500">${name}</div><div style="font-size:11px;color:var(--text3)">${m.product}</div></td>
+      <td>${typeLabels[m.type]||m.type}</td>
+      <td style="font-family:'Syne',sans-serif;font-weight:700;color:${m.type==='in'?'var(--green)':'var(--red)'}">${sign}${m.qty} ${unit}</td>
+      <td style="color:var(--text2);font-size:12px">${m.supplier||reasonLabels[m.reason]||'—'}</td>
+      <td style="color:var(--text2)">CHF ${(m.price||0).toFixed(2)}</td>
+      <td style="font-weight:600">CHF ${val.toFixed(2)}</td>
+      <td style="color:var(--text2);font-size:12px">${m.note||m.ref||'—'}</td>
+    </tr>`; }).join('');
+}
+function filterMovements(v){ renderMovements(v, document.querySelector('#lagert-history select')?.value||''); }
+function filterMovementType(v){ renderMovements(document.querySelector('#lagert-history input')?.value||'', v); }
+
+function renderProductsManage(){
+  const catNames={led:'LED-Band',profil:'Alu-Profil',netzteil:'Netzteil',dimmer:'Dimmer',zubehoer:'Zubehör'};
+  const tbody = document.getElementById('products-manage-tbody');
+  tbody.innerHTML = products.map(p=>`<tr>
+    <td style="font-family:'Syne',sans-serif;font-size:12px;color:var(--text2)">${p.nr}</td>
+    <td style="font-weight:500">${p.name}</td>
+    <td><span class="badge badge-gray">${catNames[p.cat]||p.cat}</span></td>
+    <td style="color:var(--text2)">${p.unit}</td>
+    <td style="color:var(--text2)">${p.minStock}</td>
+    <td style="color:var(--gold);font-weight:600">CHF ${p.sellPrice.toFixed(2)}</td>
+    <td><div style="display:flex;gap:6px">
+      <button class="btn btn-ghost btn-sm" onclick="editProduct('${p.nr}')">✏ Bearbeiten</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.nr}')">✕</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function showAddProduct(){
+  editingProductNr = null;
+  document.getElementById('prod-form-title').textContent = 'Neuer Artikel';
+  ['prod-nr','prod-name','prod-min','prod-buy','prod-sell'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('add-product-form').style.display='';
+}
+
+function editProduct(nr){
+  const p = products.find(x=>x.nr===nr);
+  if(!p) return;
+  editingProductNr = nr;
+  document.getElementById('prod-form-title').textContent = 'Artikel bearbeiten';
+  document.getElementById('prod-nr').value = p.nr;
+  document.getElementById('prod-name').value = p.name;
+  document.getElementById('prod-cat').value = p.cat;
+  document.getElementById('prod-unit').value = p.unit;
+  document.getElementById('prod-min').value = p.minStock;
+  document.getElementById('prod-buy').value = p.buyPrice;
+  document.getElementById('prod-sell').value = p.sellPrice;
+  document.getElementById('prod-supplier').value = p.supplier||'LEDYi';
+  document.getElementById('add-product-form').style.display='';
+  document.getElementById('add-product-form').scrollIntoView({behavior:'smooth'});
+}
+
+function saveProduct(){
+  const nr = document.getElementById('prod-nr').value.trim();
+  const name = document.getElementById('prod-name').value.trim();
+  if(!nr||!name){toast('Bitte Artikel-Nr. und Bezeichnung angeben','error');return;}
+  const prod = {
+    nr, name,
+    cat: document.getElementById('prod-cat').value,
+    unit: document.getElementById('prod-unit').value,
+    minStock: parseFloat(document.getElementById('prod-min').value)||0,
+    buyPrice: parseFloat(document.getElementById('prod-buy').value)||0,
+    sellPrice: parseFloat(document.getElementById('prod-sell').value)||0,
+    supplier: document.getElementById('prod-supplier').value,
+    stock: 0
+  };
+  if(editingProductNr){
+    const idx = products.findIndex(x=>x.nr===editingProductNr);
+    if(idx>-1){prod.stock=products[idx].stock; products[idx]=prod;}
+  } else {
+    products.push(prod);
+  }
+  document.getElementById('add-product-form').style.display='none';
+  renderProductsManage();
+  toast('Artikel gespeichert ✓','success');
+}
+
+function deleteProduct(nr){
+  if(!confirm('Artikel wirklich löschen?')) return;
+  products = products.filter(x=>x.nr!==nr);
+  renderProductsManage();
+  toast('Artikel gelöscht','info');
+}
+
+function closeModal(e){
+  if(e.target===document.getElementById('modal-overlay')) document.getElementById('modal-overlay').classList.add('hidden');
+}
+
+// ══════════════════════════════════════════════════════
+// ── E-MAIL VERSAND ────────────────────────────────────
+// ══════════════════════════════════════════════════════
+async function sendEmail(type, to, data){
+  // In Demo-Modus: nur loggen
+  if(demoMode){
+    console.log('📧 Demo E-Mail:', type, 'an', to, data);
+    toast('📧 E-Mail würde gesendet: '+type,'info');
+    return;
+  }
+  try{
+    const resp = await fetch('/api/send-email',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({type, to, data})
+    });
+    const result = await resp.json();
+    if(result.success) console.log('✅ E-Mail gesendet:', result.id);
+    else console.warn('E-Mail Fehler:', result.error);
+  }catch(e){
+    console.warn('E-Mail konnte nicht gesendet werden:', e.message);
+  }
+}
+
+// Erweitere finishPayment um E-Mail-Versand
+const _origFinishPayment = finishPayment;
+window.finishPayment = async function(method, name, email, total){
+  await _origFinishPayment(method, name, email, total);
+  // Bestellbestätigung senden
+  if(email){
+    const orderNum = document.getElementById('confirm-order-num').textContent;
+    await sendEmail('order_confirmation', email, {
+      orderNumber: orderNum,
+      customerName: name,
+      items: cart.map ? [] : [],
+      total: total.toFixed(2),
+      vat: (total*0.077/1.077).toFixed(2),
+      delivery: currentPayMethod
+    });
+  }
+};
+
+// ══════════════════════════════════════════════════════
+// ── SUPABASE LIVE FUNKTIONEN ──────────────────────────
+// ══════════════════════════════════════════════════════
+// Überschreibt Demo-Funktionen sobald Supabase verbunden
+
+function initSupabaseLive(url, key){
+  if(!window.supabase) return;
+  supabaseClient = window.supabase.createClient(url, key);
+  demoMode = false;
+
+  // Auth Listener
+  supabaseClient.auth.onAuthStateChange(async (event, session)=>{
+    if(session?.user){
+      currentUser = session.user;
+      // Profil laden
+      const {data:profile} = await supabaseClient
+        .from('profiles').select('*').eq('id',session.user.id).single();
+      if(profile) Object.assign(currentUser, {profile});
+      onUserLoggedIn(currentUser);
+      toast('Angemeldet ✓','success');
+    } else {
+      onUserLoggedOut();
+    }
+  });
+
+  // Prüfe ob schon eingeloggt
+  supabaseClient.auth.getSession().then(({data:{session}})=>{
+    if(session?.user){ currentUser=session.user; onUserLoggedIn(currentUser); }
+  });
+}
+
+// Override initSupabase to also call initSupabaseLive
+const _origInitSB = initSupabase;
+window.initSupabase = function(){
+  _origInitSB();
+  const url = document.getElementById('sb-url-inp').value.trim();
+  const key = document.getElementById('sb-key-inp').value.trim();
+  if(url && key) initSupabaseLive(url, key);
+};
+
+// Live Bestellungen aus Supabase laden
+async function sbGetOrdersLive(){
+  if(demoMode || !supabaseClient) return sbGetOrders();
+  const {data, error} = await supabaseClient
+    .from('orders').select('*').order('created_at',{ascending:false});
+  if(error){ console.warn(error); return []; }
+  return data || [];
+}
+
+// Live Bestellung speichern + E-Mail auslösen
+async function sbSaveOrderLive(order){
+  if(demoMode || !supabaseClient) return sbSaveOrder(order);
+  const orderNum = 'LS-'+new Date().getFullYear()+'-'+String(Math.floor(Math.random()*9000)+1000);
+  const {data, error} = await supabaseClient.from('orders').insert({
+    ...order,
+    order_number: orderNum,
+    user_id: currentUser?.id || null
+  }).select().single();
+  if(error){ console.warn(error); return null; }
+  // Lagerbestand aktualisieren
+  if(order.temp && order.length_m){
+    const {data:prod} = await supabaseClient
+      .from('products').select('id,stock').eq('article_nr','LED-2835-'+order.temp).single();
+    if(prod){
+      await supabaseClient.from('products').update({stock: Math.max(0, prod.stock-order.length_m)}).eq('id',prod.id);
+      await supabaseClient.from('stock_movements').insert({
+        product_id: prod.id, type:'out', quantity: order.length_m,
+        reason:'order', reference: orderNum, order_id: data?.id
+      });
+    }
+  }
+  return data;
+}
+
+// Live Rechnung speichern
+async function saveInvoiceLive(inv){
+  if(demoMode || !supabaseClient) return;
+  await supabaseClient.from('invoices').insert({
+    invoice_number: inv.id,
+    customer_name: inv.customer,
+    customer_email: inv.email||null,
+    invoice_date: inv.date,
+    due_date: inv.due,
+    currency: inv.currency||'CHF',
+    subtotal: invSubtotal(inv),
+    vat_amount: invVat(inv),
+    total: invTotal(inv),
+    status: inv.status||'draft',
+    notes: inv.notes||'',
+    items: inv.items,
+    user_id: currentUser?.id||null
+  });
+}
+
+// ── MOBILE DRAWER & NAV ───────────────────────────────
+function openMobileDrawer(){
+  document.getElementById('mobile-drawer').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeMobileDrawer(e){
+  if(e && e.target!==document.getElementById('mobile-drawer') && !e.target.classList.contains('drawer-close')) {
+    if(document.querySelector('.drawer-panel').contains(e.target)) return;
+  }
+  document.getElementById('mobile-drawer').classList.remove('open');
+  document.body.style.overflow='';
+}
+function setMobActive(page){
+  document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));
+  const btn = document.getElementById('mob-btn-'+page);
+  if(btn) btn.classList.add('active');
+}
+
+// Extend onUserLoggedIn for mobile drawer
+const _origOnUserLoggedIn = onUserLoggedIn;
+// patch mobile links visibility into existing onUserLoggedIn
+function patchMobileNav(user){
+  const show = el => { const e=document.getElementById(el); if(e) e.style.display=''; };
+  const hide = el => { const e=document.getElementById(el); if(e) e.style.display='none'; };
+  show('mob-dash-link'); show('mob-invoices-link'); show('mob-inventory-link');
+  show('mob-admin-link'); show('mob-logout-link'); hide('mob-auth-link');
+}
+
+// ── TOAST ─────────────────────────────────────────────
+function toast(msg, type='info'){
+  const el = document.createElement('div');
+  el.className='toast '+type;
+  el.innerHTML=`<div class="toast-dot ${type}"></div><span>${msg}</span>`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(()=>{el.style.animation='slideOut 0.3s ease forwards';setTimeout(()=>el.remove(),300);},3000);
+}
+
+// ── HELPERS ───────────────────────────────────────────
+function formatDate(d){const [y,m,da]=d.split('-');return da+'.'+m+'.'+y;}
+
+// ── INIT ──────────────────────────────────────────────
+buildOTP('otp-email');
+buildOTP('otp-phone');
+document.getElementById('wish-date').min = new Date().toISOString().split('T')[0];
+
+// Patch showPage to also update mobile nav
+const _origShowPage = showPage;
+window.showPage = function(name){
+  _origShowPage(name);
+  setMobActive(name);
+  // update drawer active state
+  document.querySelectorAll('[data-mob-page]').forEach(b=>b.classList.toggle('active',b.dataset.mobPage===name));
+};
+
+// Patch onUserLoggedIn to also update mobile
+const _origLogin = onUserLoggedIn;
+window.onUserLoggedIn = function(user){
+  _origLogin(user);
+  patchMobileNav(user);
+};
+
+setTimeout(()=>{
+  document.getElementById('loading-screen').style.opacity='0';
+  document.getElementById('loading-screen').style.transition='opacity 0.5s';
+  setTimeout(()=>document.getElementById('loading-screen').style.display='none',500);
+  if(demoMode){
+    currentUser = demoUser;
+    onUserLoggedIn(currentUser);
+    toast('Demo-Modus — Supabase-Keys eingeben für echte Auth','info');
+  }
+},1400);
+</script>
+
+<!-- SEO META TAGS (kostenlos) -->
+<script>
+// Dynamische SEO Meta-Tags
+(function(){
+  const metas = [
+    ['description','LEDStrip Pro – Professionelle LED-Bänder auf Mass aus der Schweiz. 2700K, 3000K, 4000K. Dimmbar, DALI, Express-Lieferung. Installation ganze Schweiz.'],
+    ['keywords','LED Band Schweiz, LED Streifen auf Mass, DALI dimmbar, COB LED, Alu Profil, LED Installation Schweiz'],
+    ['og:title','LEDStrip Pro – LED-Bänder auf Mass | Schweiz'],
+    ['og:description','Professionelle LED-Streifen konfektioniert auf Mass. 2700K bis 4000K, dimmbar, Express. Installation ganze Schweiz.'],
+    ['og:type','website'],
+    ['og:locale','de_CH'],
+    ['twitter:card','summary'],
+    ['twitter:title','LEDStrip Pro Schweiz'],
+    ['robots','index, follow'],
+    ['theme-color','#e8b84b'],
+  ];
+  metas.forEach(([name,content])=>{
+    const m = document.createElement('meta');
+    m.setAttribute(name.startsWith('og:')||name.startsWith('twitter:')?'property':'name', name);
+    m.content = content;
+    document.head.appendChild(m);
+  });
+  // Structured Data (JSON-LD) für Google
+  const ld = {
+    '@context':'https://schema.org',
+    '@type':'LocalBusiness',
+    name:'LEDStrip Pro GmbH',
+    description:'LED-Bänder auf Mass, professionelle Installation, ganze Schweiz',
+    url:'https://ledstrip-pro.ch',
+    telephone:'+41 61 123 45 67',
+    email:'info@ledstrip-pro.ch',
+    address:{'@type':'PostalAddress',streetAddress:'Gewerbestrasse 1',addressLocality:'Basel',postalCode:'4000',addressCountry:'CH'},
+    areaServed:'CH',
+    priceRange:'CHF',
+    openingHours:'Mo-Fr 08:00-17:00',
+    sameAs:[]
+  };
+  const s = document.createElement('script');
+  s.type='application/ld+json';
+  s.textContent=JSON.stringify(ld);
+  document.head.appendChild(s);
+})();
+</script>
+</body>
+</html>
